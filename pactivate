@@ -22,17 +22,15 @@ mkdir -p "$__pa_bsdir"
 
 [[ -x $__pa_bsdir/bin/pip ]] || {
     echo '----- Installing bootstrap pip'
-    curl https://bootstrap.pypa.io/get-pip.py \
-        | "$__pa_python" - -t "$__pa_bsdir"
+    curl ${__pa_quiet:+--silent} https://bootstrap.pypa.io/get-pip.py \
+        | "$__pa_python" - $__pa_quiet -t "$__pa_bsdir"
     PYTHONPATH="$__pa_bsdir" "$__pa_bsdir/bin/pip" --version
 }
 
 [[ -d $__pa_bsdir/virtualenv/ ]] || {
     echo '----- Installing bootstrap virtualenv'
     PYTHONPATH="$__pa_bsdir" "$__pa_bsdir/bin/pip" \
-        install -t "$__pa_bsdir" virtualenv
+        $__pa_quiet install -t "$__pa_bsdir" virtualenv
 }
-
-echo '----- XXX write remaining code....'
 
 __pa_cleanup
