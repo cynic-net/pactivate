@@ -1,0 +1,5 @@
+[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 2; }
+#   https://stackoverflow.com/a/28776166/107294
+(return 0 2>/dev/null) || { echo 1>&2 "source (.) this with Bash."; exit 2; }
+
+echo XXX write remaining code....
