@@ -12,6 +12,7 @@ trap 'fail "Unexpected exit"' 0
 ####################################################################
 #   Definitions and Functions
 
+ve=.build/virtualenv
 bsve=.build/bootstrap/virtualenv
 
 fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
@@ -35,18 +36,19 @@ grep -q 'Unknown argument: xyz' err-args \
     || { cat err-args; fail "bad message"; }
 
 echo '━━━━━ run pactivate 1st time'
-. ./pactivate
+(. ./pactivate)
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
+$ve/bin/pip --version || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate 2nd time'
-. ./pactivate
+(. ./pactivate && pip --version) || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate with options'
-. ./pactivate -b /test/altbuild -q
-
-ls -la altbuild/bootstrap/virtualenv/bin/
-
-fail "XXX write remaining tests...."
+mkdir -p /test/alt/build
+echo 'pyyaml>=5' > /test/alt/requirements.txt
+(. ./pactivate -b /test/alt/build -q &&
+    /test/alt/build/virtualenv/bin/python -c 'import yaml') \
+    || fail "yaml not installed from requirements.txt"
 
 trap '' 0   # Turn off "Unexpected exit" failure

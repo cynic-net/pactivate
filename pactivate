@@ -3,7 +3,8 @@
 (return 0 2>/dev/null) || { echo 1>&2 "source (.) this with Bash."; exit 3; }
 
 __pa_cleanup() {
-    unset __pa_cleanup __pa_builddir __pa_quiet __pa_python __pa_bsdir
+    unset __pa_cleanup __pa_builddir __pa_quiet __pa_python \
+        __pa_bootdir __pa_basedir __pa_requirements
 }
 
 __pa_builddir=$(cd "$(dirname "$BASH_SOURCE")" && pwd -P)/.build
@@ -17,20 +18,33 @@ esac; done;
 #   XXX need to set this from symlink, if available
 __pa_python=python3
 
-__pa_bsdir="$__pa_builddir/bootstrap/virtualenv"
-mkdir -p "$__pa_bsdir"
+__pa_bootdir="$__pa_builddir/bootstrap/virtualenv"
+mkdir -p "$__pa_bootdir"
+__pa_basedir=$(cd "$__pa_builddir/.." && pwd -L)
+__pa_requirements="$__pa_basedir/requirements.txt"
 
-[[ -x $__pa_bsdir/bin/pip ]] || {
+[[ -x $__pa_bootdir/bin/pip ]] || {
     echo '----- Installing bootstrap pip'
     curl ${__pa_quiet:+--silent} https://bootstrap.pypa.io/get-pip.py \
-        | "$__pa_python" - $__pa_quiet -t "$__pa_bsdir"
-    PYTHONPATH="$__pa_bsdir" "$__pa_bsdir/bin/pip" --version
+        | "$__pa_python" - $__pa_quiet -t "$__pa_bootdir"
+    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" --version
 }
 
-[[ -d $__pa_bsdir/virtualenv/ ]] || {
+[[ -d $__pa_bootdir/virtualenv/ ]] || {
     echo '----- Installing bootstrap virtualenv'
-    PYTHONPATH="$__pa_bsdir" "$__pa_bsdir/bin/pip" \
-        $__pa_quiet install -t "$__pa_bsdir" virtualenv
+    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" \
+        $__pa_quiet install -t "$__pa_bootdir" virtualenv
 }
 
+[[ -d $__pa_builddir/virtualenv/ ]] || {
+    echo '----- Building virtualenv'
+    PYTHONPATH="$__pa_bootdir" "$__pa_python" -s \
+        -m virtualenv $__pa_quiet --prompt $(dirname "$__pa_basedir") \
+        "$__pa_builddir/virtualenv/" \
+    && [[ -f "$__pa_requirements" ]] \
+    && "$__pa_builddir/virtualenv/bin/pip" \
+        install $__pa_quiet -r "$__pa_requirements"
+}
+
+. "$__pa_builddir"/virtualenv/*/activate
 __pa_cleanup
