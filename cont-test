@@ -2,6 +2,9 @@
 #
 #   cont-test - run within a container to test pactivate
 #
+
+#   This is important not just for our test script here, but to make sure
+#   that pactivate itself runs when sourced under these conditions.
 set -eu -o pipefail
 
 fail() { echo FAILURE: "$@"; exit 1; }
@@ -16,7 +19,14 @@ echo '----- error when run with /bin/bash'
 /bin/bash ./pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
 grep -q 'source.*with Bash' err-bash || { cat err-bash; fail "bad message"; }
 
-echo '----- run pactivate'
+echo '----- run pactivate 1st time'
 . ./pactivate
 
+echo '----- run pactivate 2nd time'
+. ./pactivate
+
+echo '----- run pactivate with options'
+. ./pactivate -b /test/altbuild -q
+
 fail "XXX write remaining tests...."
+
