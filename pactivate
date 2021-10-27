@@ -11,7 +11,7 @@ __pa_quiet=
 while [[ $# -gt 0 ]]; do case "$1" in
     -b) shift; __pa_builddir="$1"; shift;;
     -q) shift; __pa_quiet=-q;;
-    *)  echo 1>&2 "Unknown argument: $1"; __pa_cleanup; exit 2;;
+    *)  echo 1>&2 "Unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
 echo XXX __pa_builddir=$__pa_builddir

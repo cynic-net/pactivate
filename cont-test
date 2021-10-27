@@ -7,7 +7,9 @@
 #   that pactivate itself runs when sourced under these conditions.
 set -eu -o pipefail
 
-fail() { echo FAILURE: "$@"; exit 1; }
+trap 'fail "Unexpected exit"' 0
+
+fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
 
 cd /test/
 
@@ -18,6 +20,11 @@ grep -q 'source.*with Bash' err-sh || { cat err-sh; fail "bad message"; }
 echo '----- error when run with /bin/bash'
 /bin/bash ./pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
 grep -q 'source.*with Bash' err-bash || { cat err-bash; fail "bad message"; }
+
+echo '----- unknown argument error'
+. ./pactivate xyz 2>err-args && fail "didn't fail for bad arg"
+grep -q 'Unknown argument: xyz' err-args \
+    || { cat err-args; fail "bad message"; }
 
 echo '----- run pactivate 1st time'
 . ./pactivate
@@ -30,3 +37,4 @@ echo '----- run pactivate with options'
 
 fail "XXX write remaining tests...."
 
+trap '' 0   # Turn off "Unexpected exit" failure
