@@ -3,7 +3,7 @@
 (return 0 2>/dev/null) || { echo 1>&2 "source (.) this with Bash."; exit 3; }
 
 __pa_cleanup() {
-    unset __pa_cleanup __pa_builddir __pa_quiet
+    unset __pa_cleanup __pa_builddir __pa_quiet __pa_python __pa_bsdir
 }
 
 __pa_builddir=$(cd "$(dirname "$BASH_SOURCE")" && pwd -P)/.build
@@ -14,8 +14,25 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)  echo 1>&2 "Unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
-echo XXX __pa_builddir=$__pa_builddir
-echo XXX __pa_quiet=$__pa_quiet
-echo XXX write remaining code....
+#   XXX need to set this from symlink, if available
+__pa_python=python3
+
+__pa_bsdir="$__pa_builddir/bootstrap/virtualenv"
+mkdir -p "$__pa_bsdir"
+
+[[ -x $__pa_bsdir/bin/pip ]] || {
+    echo '----- Installing bootstrap pip'
+    curl https://bootstrap.pypa.io/get-pip.py \
+        | "$__pa_python" - -t "$__pa_bsdir"
+    PYTHONPATH="$__pa_bsdir" "$__pa_bsdir/bin/pip" --version
+}
+
+[[ -d $__pa_bsdir/virtualenv/ ]] || {
+    echo '----- Installing bootstrap virtualenv'
+    PYTHONPATH="$__pa_bsdir" "$__pa_bsdir/bin/pip" \
+        install -t "$__pa_bsdir" virtualenv
+}
+
+echo '----- XXX write remaining code....'
 
 __pa_cleanup
