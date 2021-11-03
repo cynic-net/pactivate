@@ -3,9 +3,12 @@ set -eu -o pipefail
 
 IMG=pactivate:deb11
 
+QUIET_TEST=
+[[ "${1-}" = -q ]] && QUIET_TEST=-q
+
 sudo -v -p '[sudo] password for %p (to run docker): '
 echo "Building container (this may take a few moments)...."
-sudo docker build -q -t "$IMG" .
+sudo docker build $QUIET_TEST -t "$IMG" .
 #sudo docker run --rm -it "$IMG" /bin/bash -l   # DEBUG
-sudo docker run --rm "$IMG" /test/cont-test
+sudo docker run --rm -e "QUIET_TEST=$QUIET_TEST" "$IMG" /test/cont-test
 

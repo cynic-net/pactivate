@@ -21,6 +21,10 @@ Options
 Developer Notes
 ---------------
 
+The tests are run with `./Test`. You can use `./Test -q` to produce
+significantly less output, but this usually makes idenitifying problems
+significantly more difficult.
+
 `pactivate`, being sourced, runs in a special environment:
 1. We cannot use `exit` because that will exit the calling script (or worse
    yet, close the window of the user that sourced the script at the command

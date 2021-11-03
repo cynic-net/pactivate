@@ -7,15 +7,15 @@
 #   that pactivate itself runs when sourced under these conditions.
 set -eu -o pipefail
 
+fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
 trap 'fail "Unexpected exit"' 0
 
 ####################################################################
 #   Definitions and Functions
 
+pactivate="./pactivate ${QUIET_TEST:+-q}"
 ve=/test/.build/virtualenv
 bsve=/test/.build/bootstrap/pactivate
-
-fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
 
 ####################################################################
 #   Tests
@@ -23,26 +23,26 @@ fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
 cd /test/
 
 echo '━━━━━ error when run with /bin/sh'
-/bin/sh   ./pactivate 2>err-sh   && fail "didn't fail when run with /bin/sh"
+/bin/sh   $pactivate 2>err-sh   && fail "didn't fail when run with /bin/sh"
 grep -q 'source.*with Bash' err-sh || { cat err-sh; fail "bad message"; }
 
 echo '━━━━━ error when run with /bin/bash'
-/bin/bash ./pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
+/bin/bash $pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
 grep -q 'source.*with Bash' err-bash || { cat err-bash; fail "bad message"; }
 
 echo '━━━━━ unknown argument error'
-. ./pactivate xyz 2>err-args && fail "didn't fail for bad arg"
+. $pactivate xyz 2>err-args && fail "didn't fail for bad arg"
 grep -q 'unknown argument: xyz' err-args \
     || { cat err-args; fail "bad message"; }
 
 echo '━━━━━ run pactivate 1st time'
-(. ./pactivate)
+(. $pactivate)
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
 $ve/bin/pip --version || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate 2nd time'
-(. ./pactivate && pip --version) || fail "pip --version didn't work"
+(. $pactivate && pip --version) || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate with options'
 #   We re-use the previous build dir so we need not bootstrap again, but
