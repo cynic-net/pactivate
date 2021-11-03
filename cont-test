@@ -13,7 +13,7 @@ trap 'fail "Unexpected exit"' 0
 #   Definitions and Functions
 
 ve=.build/virtualenv
-bsve=.build/bootstrap/virtualenv
+bsve=.build/bootstrap/pactivate
 
 fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
 

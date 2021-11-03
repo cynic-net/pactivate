@@ -18,7 +18,7 @@ esac; done;
 #   XXX need to set this from symlink, if available
 __pa_python=python3
 
-__pa_bootdir="$__pa_builddir/bootstrap/virtualenv"
+__pa_bootdir="$__pa_builddir/bootstrap/pactivate"
 mkdir -p "$__pa_bootdir"
 __pa_basedir=$(cd "$__pa_builddir/.." && pwd -L)
 __pa_requirements="$__pa_basedir/requirements.txt"
