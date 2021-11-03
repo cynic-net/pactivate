@@ -2,7 +2,6 @@ To Do
 =====
 
 Features:
-- Use $BASEDIR/.python as python interpreter, if present.
 
 Consider:
 - Some commands in `pactivate` remain untested, and some even can't be

@@ -18,8 +18,8 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
-__pa_python=python3     #   XXX need to set this from symlink, if present
-
+__pa_python=python3
+[[ -e $__pa_basedir/.python ]] && __pa_python=$__pa_basedir/.python
 __pa_requirements="$__pa_basedir/requirements.txt"
 
 [[ -z $__pa_builddir ]] && __pa_builddir=$(cd "$__pa_basedir" && pwd -P)/.build

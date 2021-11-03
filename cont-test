@@ -35,23 +35,30 @@ echo '━━━━━ unknown argument error'
 grep -q 'unknown argument: xyz' err-args \
     || { cat err-args; fail "bad message"; }
 
-echo '━━━━━ run pactivate 1st time'
+echo '━━━━━ run pactivate clean'
+#   This does the full bootstrap and virtualenv creation
 (. $pactivate)
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
 $ve/bin/pip --version || fail "pip --version didn't work"
 
-echo '━━━━━ run pactivate 2nd time'
+echo '━━━━━ run pactivate installed'
+#   This should do nothing but run the existing virtualenv's activate
 (. $pactivate && pip --version) || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate with options'
-#   We re-use the previous build dir so we need not bootstrap again, but
-#   remove the virtualenv to force a rebuild of it.
-rm -rf "$ve"
-altbase=/test/altbase; mkdir -p $altbase
+altbase=/test2/base; mkdir -p $altbase
+ln -s /usr/bin/python2 $altbase/.python
 echo 'pyyaml>=5' > $altbase/requirements.txt
-(cd /tmp && . ../test/pactivate -q -B $altbase -b /test/.build
-    $ve/bin/python -c 'import yaml') \
-    || fail "yaml not installed from requirements.txt"
+(cd /tmp && . /test/pactivate -q -B $altbase -b /test2/build) \
+    || fail "build failure"
+echo '───── testing build'
+/test2/build/virtualenv/bin/python -c 'import yaml' \
+    || fail "yaml import failure; requirements.txt broken?"
+(. /test/pactivate -q -B $altbase -b /test2/build \
+    && v=$(python -c \
+      'from platform import *; print("{}.{}".format(*python_version_tuple()))')\
+    && echo "version: $v" \
+    && [[ $v == 2.7 ]]) || fail "wrong Python version: expected 2.7"
 
 trap '' 0   # Turn off "Unexpected exit" failure

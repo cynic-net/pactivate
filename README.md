@@ -17,12 +17,17 @@ Here's summary of the files and directories used by `pactivate`:
     ├ bootstrap/pactivate/  Independent copies of pip and virtualenv
     └ virtualenv/           Virtual environment created for the project
     $BASE/
+    ├ .python               Python interpreter (or symlink) to use
     └ requirements.txt      Packages to be installed in the project virtualenv
 
 `pactivate` command-line options:
 - `-b BUILD`: Set the build dir
 - `-B BASE`: Set the base dir
 - `-q`: Run programs in quiet mode to reduce output verbosity
+
+You can use a different python interpreter by symlinking `$BASE/.python` to
+your interpreter of choice. This is not normally commited, but is in $BASE
+so that it persists even after `rm -rf $BUILD` to do a fully clean build.
 
 
 Developer Notes
