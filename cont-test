@@ -32,7 +32,7 @@ grep -q 'source.*with Bash' err-bash || { cat err-bash; fail "bad message"; }
 
 echo '━━━━━ unknown argument error'
 . ./pactivate xyz 2>err-args && fail "didn't fail for bad arg"
-grep -q 'Unknown argument: xyz' err-args \
+grep -q 'unknown argument: xyz' err-args \
     || { cat err-args; fail "bad message"; }
 
 echo '━━━━━ run pactivate 1st time'

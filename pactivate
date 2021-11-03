@@ -1,6 +1,7 @@
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 3; }
 #   https://stackoverflow.com/a/28776166/107294
-(return 0 2>/dev/null) || { echo 1>&2 "source (.) this with Bash."; exit 3; }
+(return 0 2>/dev/null) \
+    || { echo 1>&2 "source (.) pactivate with Bash."; exit 3; }
 
 __pa_cleanup() {
     unset __pa_cleanup __pa_builddir __pa_quiet __pa_python \
@@ -12,7 +13,7 @@ __pa_quiet=
 while [[ $# -gt 0 ]]; do case "$1" in
     -b) shift; __pa_builddir="$1"; shift;;
     -q) shift; __pa_quiet=-q;;
-    *)  echo 1>&2 "Unknown argument: $1"; __pa_cleanup; return 2;;
+    *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
 #   XXX need to set this from symlink, if available
