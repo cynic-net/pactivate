@@ -1,21 +1,28 @@
 pactivate
 =========
 
-`pactivate` needs to know the _base directory_ (BASEDIR) for the project
+`pactivate` needs to know the _base directory_ (BASE) for the project
 (so it can find configuration files) and the _build directory_ under which
 it will store the bootstrap files and the virtual environment that it
 creates.
 
-BASEDIR defaults to the directory in which `pactivate` resides. (It's usual
-to put `pactivate` in the root of the project if developers are sometimes
-sourcing it from the command line.) BUILDDIR is `$BASEDIR/.build/` by default.
-These may be changed with the `-B` and `-b` options respectively.
+BASE defaults to the directory in which `pactivate` resides. (It's usual to
+put `pactivate` in the root of the project if developers source it from the
+command line.) BUILD is `$BASE/.build/` by default. These may be changed
+with the `-B` and `-b` options respectively.
 
-Options
--------
+Here's summary of the files and directories used by `pactivate`:
 
-- `-b BUILDDIR`: Set the build dir
-- `-B BUILDDIR`: Set the base dir
+    $BUILD/
+    ├ bootstrap/pactivate/  Independent copies of pip and virtualenv
+    └ virtualenv/           Virtual environment created for the project
+    $BASE/
+    └ requirements.txt      Packages to be installed in the project virtualenv
+
+`pactivate` command-line options:
+- `-b BUILD`: Set the build dir
+- `-B BASE`: Set the base dir
+- `-q`: Run programs in quiet mode to reduce output verbosity
 
 
 Developer Notes
