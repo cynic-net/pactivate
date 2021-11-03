@@ -3,7 +3,7 @@ set -eu -o pipefail
 
 IMG=pactivate:deb11
 
-sudo -v
+sudo -v -p '[sudo] password for %p (to run docker): '
 sudo docker build -q -t "$IMG" .
 #sudo docker run --rm -it "$IMG" /bin/bash -l   # DEBUG
 sudo docker run --rm "$IMG" /test/cont-test
