@@ -1,10 +1,10 @@
-[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 3; }
+[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
 (return 0 2>/dev/null) \
-    || { echo 1>&2 "source (.) pactivate with Bash."; exit 3; }
+    || { echo 1>&2 "source (.) pactivate with Bash."; exit 9; }
 
 __pa_cleanup() {
-    unset __pa_cleanup __pa_builddir __pa_quiet __pa_python \
+    unset __pa_cleanup __pa_builddir __pa_quiet __pa_python __pa_pyver \
         __pa_bootdir __pa_basedir __pa_requirements
 }
 
@@ -19,6 +19,7 @@ while [[ $# -gt 0 ]]; do case "$1" in
 esac; done;
 
 __pa_python=python3     #   XXX need to set this from symlink, if present
+
 __pa_requirements="$__pa_basedir/requirements.txt"
 
 [[ -z $__pa_builddir ]] && __pa_builddir=$(cd "$__pa_basedir" && pwd -P)/.build
@@ -27,8 +28,21 @@ __pa_bootdir="$__pa_builddir/bootstrap/pactivate"
 mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 
 [[ -x $__pa_bootdir/bin/pip ]] || {
-    echo '----- Installing bootstrap pip'
-    curl ${__pa_quiet:+--silent} https://bootstrap.pypa.io/get-pip.py \
+    echo '----- Checking Python version'
+    echo "Using $__pa_python"
+    echo -n "Version: "
+    "$__pa_python" --version || {
+        echo 1>&2 "pactivate: bad python interpreter"
+        __pa_cleanup; return 3
+    }
+    __pa_pyver=$("$__pa_python" -c '
+from platform import *;
+if (python_version() < "3.6"):
+    print("{}.{}".format(*python_version_tuple()))
+        ')
+    echo "----- Installing bootstrap pip (ver=${__pa_pyver:-latest})"
+    curl ${__pa_quiet:+--silent} \
+        "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \
         | "$__pa_python" - $__pa_quiet -t "$__pa_bootdir"
     PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" --version
 }
