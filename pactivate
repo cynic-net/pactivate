@@ -1,4 +1,4 @@
-#   pactivate v0.1  https://github.com/0cjs/pactivate
+#   pactivate v0.2  https://github.com/0cjs/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -7,7 +7,7 @@
 
 __pa_cleanup() {
     unset __pa_cleanup __pa_echo \
-        __pa_builddir __pa_quiet __pa_python __pa_pyver \
+        __pa_builddir __pa_quiet __pa_python __pa_python_deref __pa_pyver \
         __pa_bootdir __pa_basedir __pa_requirements
 }
 __pa_echo() { [[ -n $__pa_quiet ]] || echo "$@"; }
@@ -67,10 +67,21 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 [[ -d $__pa_builddir/virtualenv/ ]] || {
     echo '----- Building virtualenv'
     echo -n "Using $__pa_python"
-    [[ -L $__pa_python ]] && echo -n "-> $(readlink "$__pa_python")"
-    echo
+    if [[ -L $__pa_python ]]; then
+        #   MacOS readlink has no -f option, so we must do this the hard
+        #   way. Fortunately we already know that the binary exists and is
+        #   a Python interpreter.
+        __pa_python_deref=$(readlink "$__pa_python")
+        __pa_python_deref=$(cd "$__pa_basedir" \
+            && cd $(dirname "$__pa_python_deref") \
+            && pwd -P)/$(basename "$__pa_python_deref")
+        echo " -> $__pa_python_deref"
+    else
+        __pa_python_deref="$__pa_python"
+        echo
+    fi
     echo -n "Version: " && "$__pa_python" --version
-    PYTHONPATH="$__pa_bootdir" "$__pa_python" -s -m virtualenv \
+    PYTHONPATH="$__pa_bootdir" "$__pa_python_deref" -s -m virtualenv \
         $__pa_quiet --prompt $(dirname "$__pa_basedir") \
         "$__pa_builddir/virtualenv/" \
     && [[ -f "$__pa_requirements" ]] \

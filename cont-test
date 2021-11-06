@@ -28,6 +28,8 @@ build=/test/.build
 virtualenv=$build/virtualenv
 bsve=$build/bootstrap/pactivate
 
+clean_virtualenv() { rm -rf "$virtualenv"; }
+
 ####################################################################
 #   Tests
 
@@ -59,7 +61,22 @@ echo '━━━━━ run pactivate installed'
 #   for easier debugging in the more complex "with options" test below.
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 
-echo '━━━━━ run pactivate with options'
+echo '━━━━━ re-install virtualenv with .python symlink'
+clean_virtualenv
+#   We use a relative symlink here to ensure that pactivate finds the absolute
+#   path to it, rather than re-using the relative path at a different
+#   directory level and thus having the link point to the wrong place.
+ln -s ../usr/bin/python3 .python
+(. $pactivate -q && pip --version) || fail "pip --version didn't work"
+echo '───── removing .python symlink'
+#   A virtualenv created with the .python symlink should still work even
+#   if the symlink is removed or, more importantly, changed. Removal would
+#   break in an obvious way, but changing to a different version of Python
+#   might break the virtualenv in much more subtle ways.
+rm .python
+(. $pactivate -q && pip --version) || fail "pip --version didn't work"
+
+echo '━━━━━ run pactivate with Python 2 and requirements.txt'
 #   Alternate base dir configured for different Python interpreter.
 altbase=/test/altbase; mkdir -p $altbase
 ln -s /usr/bin/python2 $altbase/.python
@@ -67,7 +84,7 @@ echo 'pyyaml>=5' > $altbase/requirements.txt
 #   We re-use the existing build dir because we're testing download of a
 #   non-modern (2.7) Python bootstrap, so the bootstrap dir will be
 #   different; we need remove only the virtualenv.
-rm -rf $virtualenv
+clean_virtualenv
 #   Rebuild and check
 echo '───── running build'
 (cd /tmp && . /test/$pactivate -B $altbase -b $build) \
@@ -84,6 +101,12 @@ echo '───── testing activation and Python version'
 echo '───── testing yaml import'
 $build/virtualenv/bin/python -c 'import yaml' \
     || fail "yaml import failure; requirements.txt broken?"
+
+echo '───── checking .python difference warning'
+#   This should print a warning message about the interpreter being different.
+#   This won't fail if the warning isn't printed, but you can at least
+#   manually confirm that it's there.
+(. $pactivate -q && pip --version) || fail "pip --version didn't work"
 
 echo '━━━━━ TESTS COMPLETE'
 TEST_PASSED=true

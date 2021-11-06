@@ -19,16 +19,23 @@ put `pactivate` in the root of the project if developers source it from the
 command line.) BUILD is `$BASE/.build/` by default. These may be changed
 with the `-B` and `-b` options respectively.
 
-Here's summary of the files and directories used by `pactivate`:
+### Files and Directories
 
     $BUILD/
     ├ bootstrap/pactivate/  Independent copies of pip and virtualenv
     └ virtualenv/           Virtual environment created for the project
     $BASE/
-    ├ .python               Python interpreter (or symlink) to use
+    ├ .python               Python interpreter for building virtualenv
     └ requirements.txt      Packages to be installed in the project virtualenv
 
-`pactivate` command-line options:
+If it exists, `.python` (which is typically a symlink) is used only to
+install a new virtualenv when there isn't an existing one. However, even
+after this, if it exists it _must always_ point to a valid Python
+interpreter or pactivate will fail. (This is a bug, but probably not worth
+the complexity to fix.)
+
+### Command-line options
+
 - `-b BUILD`: Set the build dir
 - `-B BASE`: Set the base dir
 - `-i`: Enter interactive shell in container after the test completes
