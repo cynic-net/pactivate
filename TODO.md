@@ -2,10 +2,6 @@ To Do
 =====
 
 Features:
-- We should compare `$__pa_python` to `$__pa_builddir/virtualenv/python`
-  and emit a warning if they're not the same. (We don't want to just
-  rebuild the virtualenv because it might have been built manually for
-  testing purposes.)
 - On Windows (MinGW) the default Python interpreter (when there is no
   `$BASE/.python` link) should be `py`, not `python3`.
 

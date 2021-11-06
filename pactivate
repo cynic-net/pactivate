@@ -76,5 +76,11 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
         install $__pa_quiet -r "$__pa_requirements"
 }
 
+cmp -s $(type -p "$__pa_python") "$__pa_builddir/virtualenv/bin/python" || (
+    ve=$("$__pa_builddir"/virtualenv/bin/python --version 2>&1)
+    pa=$("$__pa_python" --version 2>&1)
+    echo 1>&2 "WARNING: virtualenv/bin/python ($ve) is not $__pa_python ($pa)"
+    )
+
 . "$__pa_builddir"/virtualenv/*/activate
 __pa_cleanup
