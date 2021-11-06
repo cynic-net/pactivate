@@ -55,8 +55,8 @@ if (python_version() < "3.6"):
 
 [[ -d $__pa_builddir/virtualenv/ ]] || {
     echo '----- Building virtualenv'
-    PYTHONPATH="$__pa_bootdir" "$__pa_python" -s \
-        -m virtualenv $__pa_quiet --prompt $(dirname "$__pa_basedir") \
+    PYTHONPATH="$__pa_bootdir" "$__pa_python" -s -m virtualenv \
+        $__pa_quiet --prompt $(dirname "$__pa_basedir") \
         "$__pa_builddir/virtualenv/" \
     && [[ -f "$__pa_requirements" ]] \
     && "$__pa_builddir/virtualenv/bin/pip" \
