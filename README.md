@@ -31,6 +31,7 @@ Here's summary of the files and directories used by `pactivate`:
 `pactivate` command-line options:
 - `-b BUILD`: Set the build dir
 - `-B BASE`: Set the base dir
+- `-i`: Enter interactive shell in container after the test completes
 - `-q`: Run programs in quiet mode to reduce output verbosity
 
 You can use a different python interpreter by symlinking `$BASE/.python` to
@@ -41,9 +42,12 @@ so that it persists even after `rm -rf $BUILD` to do a fully clean build.
 Developer Notes
 ---------------
 
-The tests are run with `./Test`. You can use `./Test -q` to produce
+The tests are run with `./Test`. You can use the `-q` option to produce
 significantly less output, but this usually makes idenitifying problems
-significantly more difficult.
+significantly more difficult. The `-i` option will start an interactive
+shell in the test container after the test completes or fails (the startup
+message will give the exit code indicating success or failure) to allow for
+interactive investigation of problems or simply playing with the script.
 
 The tests are run in a Docker container to ensure that `pactivate` does not
 accidentally use an existing installation of `pip` or `virtualenv`. The

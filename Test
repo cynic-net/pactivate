@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
-IMG=pactivate:deb11
+IMG=pactivate:deb11     # name of the image we build for testing
+TEST_INTERACT=false     # `true` if we start an interactive shell in the
+                        #   container after running the tests
+TEST_QUIET=             # -q if we are running tests as quietly as possible
 
-QUIET_TEST=
-[[ "${1-}" = -q ]] && QUIET_TEST=-q
+while [[ $# -gt 0 ]]; do case "$1" in
+    -i)     shift; TEST_INTERACT=true;;
+    -q)     shift; TEST_QUIET=-q;;
+    *)      echo 1>&2 "$0: Unknown argument: $1"; exit 2;;
+esac; done
 
 sudo -v -p '[sudo] password for %p (to run docker): '
 echo "Building container (this may take a few moments)...."
-sudo docker build $QUIET_TEST -t "$IMG" .
-#sudo docker run --rm -it "$IMG" /bin/bash -l   # DEBUG
-sudo docker run --rm -e "QUIET_TEST=$QUIET_TEST" "$IMG" /test/cont-test
-
+sudo docker build $TEST_QUIET -t "$IMG" .
+sudo docker run -it \
+    -e "TEST_INTERACT=$TEST_INTERACT" -e "TEST_QUIET=$TEST_QUIET" \
+    "$IMG" /test/cont-test

@@ -7,14 +7,23 @@
 #   that pactivate itself runs when sourced under these conditions.
 set -eu -o pipefail
 
-fail() { trap '' 0; echo FAILURE: "$@"; exit 1; }
-trap 'fail "Unexpected exit"' 0
+TEST_PASSED=false
+trap '
+    ec=$?
+    $TEST_PASSED || echo "FAILURE: unexpected exit"
+    $TEST_INTERACT || exit $ec
+    echo "━━━━━ Entering interactive shell for debugging (last exit code=$ec)"
+    exec bash -l
+' 0
+
+fail() { echo FAILURE: "$@"; TEST_PASSED=true; exit 1; }
 
 ####################################################################
 #   Definitions and Functions
 
-echo "━━━━━ TESTS START with QUIET_TEST='$QUIET_TEST'"
-pactivate="./pactivate ${QUIET_TEST:+-q}"
+echo -n '━━━━━ TESTS START with '
+echo    "TEST_QUIET='$TEST_QUIET' TEST_INTERACT='$TEST_INTERACT'"
+pactivate="./pactivate ${TEST_QUIET:+-q}"
 build=/test/.build
 virtualenv=$build/virtualenv
 bsve=$build/bootstrap/pactivate
@@ -77,4 +86,4 @@ $build/virtualenv/bin/python -c 'import yaml' \
     || fail "yaml import failure; requirements.txt broken?"
 
 echo '━━━━━ TESTS COMPLETE'
-trap '' 0   # Turn off "Unexpected exit" failure
+TEST_PASSED=true
