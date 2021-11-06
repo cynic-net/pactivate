@@ -6,6 +6,8 @@ Features:
   and emit a warning if they're not the same. (We don't want to just
   rebuild the virtualenv because it might have been built manually for
   testing purposes.)
+- On Windows (MinGW) the default Python interpreter (when there is no
+  `$BASE/.python` link) should be `py`, not `python3`.
 
 Consider:
 - Some commands in `pactivate` remain untested, and some even can't be
