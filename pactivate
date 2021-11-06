@@ -20,16 +20,14 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
-__pa_echo '----- Checking Python interpreter'
 __pa_python=python3     # XXX should default to `py` for Windows
 #   Even if it's a dangling link (-e fails) we use it so that user sees error.
 [[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]] \
     && __pa_python=$__pa_basedir/.python
-__pa_echo "Using $__pa_python"
-__pa_echo "Linked to $(readlink "$__pa_python")"
-#   Check $__pa_quiet before we evaluate $(...)
-[[ -z $__pa_quiet ]] && echo -n "Version: " && "$__pa_python" --version
 "$__pa_python" --version >/dev/null 2>&1 || {
+    [[ -L $__pa_python ]] \
+        && echo "$__pa_python -> $(readlink "$__pa_python")"
+    $__pa_python --version || true      # Display the suppressed error message
     echo 1>&2 "pactivate: bad python interpreter"
     __pa_cleanup; return 3
 }
@@ -66,6 +64,10 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 
 [[ -d $__pa_builddir/virtualenv/ ]] || {
     echo '----- Building virtualenv'
+    echo -n "Using $__pa_python"
+    [[ -L $__pa_python ]] && echo -n "-> $(readlink "$__pa_python")"
+    echo
+    echo -n "Version: " && "$__pa_python" --version
     PYTHONPATH="$__pa_bootdir" "$__pa_python" -s -m virtualenv \
         $__pa_quiet --prompt $(dirname "$__pa_basedir") \
         "$__pa_builddir/virtualenv/" \
