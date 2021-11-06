@@ -4,9 +4,11 @@
     || { echo 1>&2 "source (.) pactivate with Bash."; exit 9; }
 
 __pa_cleanup() {
-    unset __pa_cleanup __pa_builddir __pa_quiet __pa_python __pa_pyver \
+    unset __pa_cleanup __pa_echo \
+        __pa_builddir __pa_quiet __pa_python __pa_pyver \
         __pa_bootdir __pa_basedir __pa_requirements
 }
+__pa_echo() { [[ -n $__pa_quiet ]] || echo "$@"; }
 
 __pa_basedir=$(cd "$(dirname "$BASH_SOURCE")" && pwd -P)
 __pa_builddir=
@@ -18,28 +20,37 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
-__pa_python=python3
-[[ -e $__pa_basedir/.python ]] && __pa_python=$__pa_basedir/.python
+__pa_echo '----- Checking Python interpreter'
+__pa_python=python3     # XXX should default to `py` for Windows
+#   Even if it's a dangling link (-e fails) we use it so that user sees error.
+[[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]] \
+    && __pa_python=$__pa_basedir/.python
+__pa_echo "Using $__pa_python"
+__pa_echo "Linked to $(readlink "$__pa_python")"
+#   Check $__pa_quiet before we evaluate $(...)
+[[ -z $__pa_quiet ]] && echo -n "Version: " && "$__pa_python" --version
+"$__pa_python" --version >/dev/null 2>&1 || {
+    echo 1>&2 "pactivate: bad python interpreter"
+    __pa_cleanup; return 3
+}
+#   $__pa_pyver is empty for "modern" versions of Python (i.e., those that
+#   can use the current get-pip.py, 3.6 and above) and otherwise is the
+#   major.minor revision number, suitable for use in the URL to download
+#   an alternate version of get-pip.py.
+__pa_pyver=$("$__pa_python" -c '
+from platform import *;
+if (python_version() < "3.6"):
+    print("{}.{}".format(*python_version_tuple()))
+')
+
 __pa_requirements="$__pa_basedir/requirements.txt"
 
 [[ -z $__pa_builddir ]] && __pa_builddir=$(cd "$__pa_basedir" && pwd -P)/.build
 
-__pa_bootdir="$__pa_builddir/bootstrap/pactivate"
+__pa_bootdir="$__pa_builddir/bootstrap/pactivate${__pa_pyver}"
 mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 
 [[ -x $__pa_bootdir/bin/pip ]] || {
-    echo '----- Checking Python version'
-    echo "Using $__pa_python"
-    echo -n "Version: "
-    "$__pa_python" --version || {
-        echo 1>&2 "pactivate: bad python interpreter"
-        __pa_cleanup; return 3
-    }
-    __pa_pyver=$("$__pa_python" -c '
-from platform import *;
-if (python_version() < "3.6"):
-    print("{}.{}".format(*python_version_tuple()))
-        ')
     echo "----- Installing bootstrap pip (ver=${__pa_pyver:-latest})"
     curl ${__pa_quiet:+--silent} \
         "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \

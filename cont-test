@@ -13,9 +13,11 @@ trap 'fail "Unexpected exit"' 0
 ####################################################################
 #   Definitions and Functions
 
+echo "━━━━━ TESTS START with QUIET_TEST='$QUIET_TEST'"
 pactivate="./pactivate ${QUIET_TEST:+-q}"
-ve=/test/.build/virtualenv
-bsve=/test/.build/bootstrap/pactivate
+build=/test/.build
+virtualenv=$build/virtualenv
+bsve=$build/bootstrap/pactivate
 
 ####################################################################
 #   Tests
@@ -40,25 +42,39 @@ echo '━━━━━ run pactivate clean'
 (. $pactivate)
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
-$ve/bin/pip --version || fail "pip --version didn't work"
+$virtualenv/bin/pip --version || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate installed'
 #   This should do nothing but run the existing virtualenv's activate
-(. $pactivate && pip --version) || fail "pip --version didn't work"
+#   It also tests the -q option so we can leave it out (by default)
+#   for easier debugging in the more complex "with options" test below.
+(. $pactivate -q && pip --version) || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate with options'
-altbase=/test2/base; mkdir -p $altbase
+#   Alternate base dir configured for different Python interpreter.
+altbase=/test/altbase; mkdir -p $altbase
 ln -s /usr/bin/python2 $altbase/.python
 echo 'pyyaml>=5' > $altbase/requirements.txt
-(cd /tmp && . /test/pactivate -q -B $altbase -b /test2/build) \
+#   We re-use the existing build dir because we're testing download of a
+#   non-modern (2.7) Python bootstrap, so the bootstrap dir will be
+#   different; we need remove only the virtualenv.
+rm -rf $virtualenv
+#   Rebuild and check
+echo '───── running build'
+(cd /tmp && . /test/$pactivate -B $altbase -b $build) \
     || fail "build failure"
-echo '───── testing build'
-/test2/build/virtualenv/bin/python -c 'import yaml' \
-    || fail "yaml import failure; requirements.txt broken?"
-(. /test/pactivate -q -B $altbase -b /test2/build \
+[[ -d ${bsve}2.7 ]] || {
+    ls -la $build/bootstrap/;
+    fail "versioned bootstrap dir not found"; }
+echo '───── testing activation and Python version'
+(. /test/$pactivate -B $altbase -b $build \
     && v=$(python -c \
       'from platform import *; print("{}.{}".format(*python_version_tuple()))')\
-    && echo "version: $v" \
+    && echo "Testing version: $v" \
     && [[ $v == 2.7 ]]) || fail "wrong Python version: expected 2.7"
+echo '───── testing yaml import'
+$build/virtualenv/bin/python -c 'import yaml' \
+    || fail "yaml import failure; requirements.txt broken?"
 
+echo '━━━━━ TESTS COMPLETE'
 trap '' 0   # Turn off "Unexpected exit" failure

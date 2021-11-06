@@ -2,6 +2,10 @@ To Do
 =====
 
 Features:
+- We should compare `$__pa_python` to `$__pa_builddir/virtualenv/python`
+  and emit a warning if they're not the same. (We don't want to just
+  rebuild the virtualenv because it might have been built manually for
+  testing purposes.)
 
 Consider:
 - Some commands in `pactivate` remain untested, and some even can't be
