@@ -45,6 +45,15 @@ The tests are run with `./Test`. You can use `./Test -q` to produce
 significantly less output, but this usually makes idenitifying problems
 significantly more difficult.
 
+The tests are run in a Docker container to ensure that `pactivate` does not
+accidentally use an existing installation of `pip` or `virtualenv`. The
+`Test` script runs `docker` with `sudo` and so will first prompt for your
+sudo password if sudo requires one and your sudo credentials are not
+already cached. (The `docker` command [grants full root privileges to any
+user that can run it][docker-is-root], so you should not use a "docker"
+group; not granting sudo privileges to members of that group simply
+disguises the fact that they have full root access anyway.)
+
 `pactivate`, being sourced, runs in a special environment:
 1. We cannot use `exit` because that will exit the calling script (or worse
    yet, close the window of the user that sourced the script at the command
@@ -62,3 +71,4 @@ significantly more difficult.
 <!-------------------------------------------------------------------->
 [pip]: https://en.wikipedia.org/wiki/Pip_(package_manager)
 [pythonz]: https://github.com/saghul/pythonz
+[docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
