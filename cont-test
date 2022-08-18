@@ -31,7 +31,7 @@ esac; done
 ####################################################################
 #   Definitions and Functions
 
-echo -n '━━━━━ TESTS START with '
+echo -n '━━━━━ container TESTS START with '
 echo    "TEST_QUIET='$TEST_QUIET' TEST_INTERACT='$TEST_INTERACT'"
 pactivate="./pactivate ${TEST_QUIET:+-q}"
 build=/test/.build
@@ -49,16 +49,6 @@ echo '━━━━━ error when run with /bin/sh'
 /bin/sh   $pactivate 2>err-sh   && fail "didn't fail when run with /bin/sh"
 [[ 'source (.) this with Bash.' == "$(cat err-sh)" ]] \
     || { cat err-sh; fail "bad message"; }
-
-echo '━━━━━ error when run with /bin/bash'
-/bin/bash $pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
-[[ 'source (.) pactivate with Bash.' == "$(cat err-bash)" ]] \
-    || { cat err-bash; fail "bad message"; }
-
-echo '━━━━━ unknown argument error'
-. $pactivate xyz 2>err-args && fail "didn't fail for bad arg"
-[[ 'pactivate: unknown argument: xyz' == $(cat err-args) ]] \
-    || { cat err-args; fail "bad message"; }
 
 echo '━━━━━ run pactivate clean'
 #   This does the full bootstrap and virtualenv creation

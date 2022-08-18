@@ -12,6 +12,8 @@ sudo -v -p '[sudo] password for %p (to run docker): '
 args_words_regex="^($(IFS=\|; echo "$*"))$"
 quiet=; [[ -q =~ $args_words_regex ]] && quiet=-q
 
+./noncont-test "$@"
+
 echo "Building container (this may take a few moments)...."
 sudo docker build $quiet -t "$IMG" .
 sudo docker run -it "$IMG" /test/cont-test "$@"

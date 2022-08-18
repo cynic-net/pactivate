@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+#   nocont-test - pactivate tests that do not need to run in a container
+#
+
+#   This is important not just for our test script here, but to make sure
+#   that pactivate itself runs when sourced under these conditions.
+set -eu -o pipefail
+
+TEST_PASSED=false
+trap '
+    ec=$?
+    $TEST_PASSED || echo "FAILURE: unexpected exit"
+' 0
+
+fail() { echo FAILURE: "$@"; TEST_PASSED=true; exit 1; }
+
+TEST_INTERACT=false # not used in noncont-test
+TEST_QUIET=         # -q if we are running tests as quietly as possible
+while [[ $# -gt 0 ]]; do case "$1" in
+    -i)     shift; TEST_INTERACT=true;;
+    -q)     shift; TEST_QUIET=-q;;
+    *)      fail "$0: Unknown argument: $1"; exit 2;;
+esac; done
+
+####################################################################
+#   Definitions and Functions
+
+echo -n '━━━━━ TESTS START with '
+echo    "TEST_QUIET='$TEST_QUIET'"
+export BASE_DIR=$(cd "$(dirname "$0")" && pwd -P)
+pactivate="$BASE_DIR/pactivate ${TEST_QUIET:+-q}"
+build="$BASE_DIR/.build"
+virtualenv="$build/virtualenv"
+bsve="$build/bootstrap/pactivate"
+to="$build/test-output/"
+
+mkdir -p "$to"
+
+echo '━━━━━ error when run with /bin/bash'
+/bin/bash $pactivate 2>"$to/err-bash" \
+    && fail "didn't fail when run with /bin/bash"
+[[ 'source (.) pactivate with Bash.' == $(cat "$to/err-bash") ]] \
+    || { cat "$to/err-bash"; fail "bad message"; }
+
+echo '━━━━━ unknown argument error'
+. $pactivate xyz 2>"$to/err-args" && fail "didn't fail for bad arg"
+[[ 'pactivate: unknown argument: xyz' == $(cat "$to/err-args") ]] \
+    || { cat "$to/err-args"; fail "bad message"; }
+
+echo '━━━━━ TESTS COMPLETE'
+TEST_PASSED=true
