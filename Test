@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
+export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
+
 IMG=pactivate:deb11     # name of the image we build for testing
 TEST_INTERACT=false     # `true` if we start an interactive shell in the
                         #   container after running the tests
@@ -12,7 +14,9 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)      echo 1>&2 "$0: Unknown argument: $1"; exit 2;;
 esac; done
 
+cd "$PROJDIR"
 sudo -v -p '[sudo] password for %p (to run docker): '
+
 echo "Building container (this may take a few moments)...."
 sudo docker build $TEST_QUIET -t "$IMG" .
 sudo docker run -it \
