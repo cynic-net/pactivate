@@ -4,21 +4,14 @@ set -eu -o pipefail
 export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
 
 IMG=pactivate:deb11     # name of the image we build for testing
-TEST_INTERACT=false     # `true` if we start an interactive shell in the
-                        #   container after running the tests
-TEST_QUIET=             # -q if we are running tests as quietly as possible
-
-while [[ $# -gt 0 ]]; do case "$1" in
-    -i)     shift; TEST_INTERACT=true;;
-    -q)     shift; TEST_QUIET=-q;;
-    *)      echo 1>&2 "$0: Unknown argument: $1"; exit 2;;
-esac; done
 
 cd "$PROJDIR"
 sudo -v -p '[sudo] password for %p (to run docker): '
 
+#   Turn e.g. '-i -q' into '^(-i|-q)$' to let us find '-q' in arguments
+args_words_regex="^($(IFS=\|; echo "$*"))$"
+quiet=; [[ -q =~ $args_words_regex ]] && quiet=-q
+
 echo "Building container (this may take a few moments)...."
-sudo docker build $TEST_QUIET -t "$IMG" .
-sudo docker run -it \
-    -e "TEST_INTERACT=$TEST_INTERACT" -e "TEST_QUIET=$TEST_QUIET" \
-    "$IMG" /test/cont-test
+sudo docker build $quiet -t "$IMG" .
+sudo docker run -it "$IMG" /test/cont-test "$@"
