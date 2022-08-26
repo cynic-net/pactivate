@@ -42,8 +42,8 @@ echo '━━━━━ error when run with /bin/sh'
 
 echo '━━━━━ error when run with /bin/bash'
 /bin/bash $pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
-[[ 'source (.) this with Bash.' == "$(cat err-sh)" ]] \
-    || { cat err-sh; fail "bad message"; }
+[[ 'source (.) pactivate with Bash.' == "$(cat err-bash)" ]] \
+    || { cat err-bash; fail "bad message"; }
 
 echo '━━━━━ unknown argument error'
 . $pactivate xyz 2>err-args && fail "didn't fail for bad arg"
