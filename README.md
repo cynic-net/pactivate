@@ -46,6 +46,48 @@ your interpreter of choice. This is not normally commited, but is in $BASE
 so that it persists even after `rm -rf $BUILD` to do a fully clean build.
 
 
+Theory of Operation
+-------------------
+
+The general plan is that we create a bootstrap directory,
+`$BUILD/bootstrap/pactivate/`, into which we install the `virtualenv`
+package, and then use that `virtualenv` package to create the virtual
+environment.
+
+Note that the bootstrap directory, though it looks similar to the virtual
+environment directories created by `virtualenv`, is much more limited. In
+particular, it depends on the user correctly setting up the runtime
+environment (usually with the `PYTHONPATH` environment variable, etc.)
+before loading or executing any of the bootstrap files.
+
+1. pactivate determines which Python version is being used and fetches the
+   appropriate version of `get-pip.py` from pypa.io. (Pythons ≥3.6 all use
+   the latest version of that script; earlier versions of Python have their
+   own versions of that script.) If not using the latest version, the
+   `$BUILD/bootstrap/pactivate` directory will have the version number
+   appended to it. (This is necessary to avoid using the wrong version of
+   Pip if the user changes to a different Python version after running the
+   bootstrap once.)
+2. pactivate runs `git-pip.py`, directing it to install Pip to the
+   bootstrap directory. This also installs Pip's dependencies, `setuptools`
+   and `wheel`.
+3. pactivate then uses that version of Pip to install the `virtualenv`
+   module to the same bootstrap directory.
+4. pactivate uses the `virtualenv` package from the bootstrap directory to
+   create the `$BUILD/virtualenv` virtual environment. `virtualenv`
+   installs `bin/activate`, `bin/python`, `bin/pip`, etc. into that
+   directory.
+
+This new virtual environment provides all the usual environmental setup to
+make sure it's used for any programs run from it. That is, running
+`$BUILD/virtualenv/bin/pip` will use that virtual environment's Pip, as
+opposed to some other version of Pip installed in a more standard place on
+the system.
+
+"Developer Notes" below also contains some further details on how the script
+works and some of the constraints it must deal with.
+
+
 Developer Notes
 ---------------
 
