@@ -3,11 +3,15 @@ pactivate
 
 `pactivate` is a script to build a Python virtualenv for a project that has
 no dependencies on any Python packages not distributed with Python itself,
-not even [pip]. You need only Python itself (such as one supplied by your
-OS packaging system, one built by [Pythonz], or a manual download and build
-of the Python source). Note that some Linux distributions do not supply all
-of the base Python system in the standard package; with Debian for example
-you must install `python3-distutils` as well as `python3`.
+not even [Pip]. It completely ignores any Pip, [virtualenv] or other
+packages provided by the operating system distribution or in user-specific
+directories.
+
+The only requirement is Python itself, which may be supplied by your OS
+packaging system, [Pythonz], or a manual download and build of the Python
+source. Note that some Linux distributions do not supply all of the base
+Python system in the standard package; with Debian for example you must
+install `python3-distutils` as well as `python3`.
 
 `pactivate` needs to know the _base directory_ (BASE) for your project
 (so it can find configuration files) and the _build directory_ under which
@@ -122,6 +126,7 @@ disguises the fact that they have full root access anyway.)
 
 
 <!-------------------------------------------------------------------->
+[docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
 [pip]: https://en.wikipedia.org/wiki/Pip_(package_manager)
 [pythonz]: https://github.com/saghul/pythonz
-[docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
+[virtualenv]: https://pypi.org/project/virtualenv/
