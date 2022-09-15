@@ -25,18 +25,18 @@ with the `-B` and `-b` options respectively.
 
 ### Files and Directories
 
+    $PROJDIR/
+    ├ .python               (Optional) Python interpreter for the virtualenv
+    └ requirements.txt      (Optional) Package list for the virtualenv
+
     $BUILD/
     ├ bootstrap/pactivate/  Independent copies of pip and virtualenv
     └ virtualenv/           Virtual environment created for the project
-    $PROJDIR/
-    ├ .python               Python interpreter for building virtualenv
-    └ requirements.txt      Packages to be installed in the project virtualenv
 
-If it exists, `.python` (which is typically a symlink) is used only to
-install a new virtualenv when there isn't an existing one. However, even
-after this, if it exists it _must always_ point to a valid Python
-interpreter or pactivate will fail. (This is a bug, but probably not worth
-the complexity to fix.)
+If it exists, `$PROJDIR/.python` (which is typically a symlink) is used
+only to install a new virtualenv when there isn't an existing one. Changing
+this after the virtualenv has been built will not change the interpreter
+used in the existing virtualenv.
 
 ### Command-line options
 
