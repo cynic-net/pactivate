@@ -28,9 +28,87 @@ slower) version of `virtualenv` that doesn't receive updates as often.
 
 ### Contents
 
+- Basic Usage
 - Directories and Options
 - Theory of Operation
 - Developer Notes
+
+
+Basic Usage
+-----------
+
+The most common way of using this is to copy the `pactivate` script into
+your project directory and have your build/test script source it before
+performing its other actions. For example:
+
+    $ git init myproject
+    $ cd myproject
+    $ curl -O https://raw.githubusercontent.com/0cjs/pactivate/main/pactivate
+    $ git add pactivate
+    $ git commit -m 'pactivate: from https://github.com/0cjs/pactivate'
+
+At this point you can [source] `pactivate` just as you would the
+[`activate`] script from virtualenv to modify your shell environment to be
+using the Python virtual environment:
+
+    source ./pactivate -q       # Leave off `-q` if you want verbose mode
+
+This will build a virtual environment in `.build/virtualenv/` if necessary
+and then source the `.build/virtualenv/*/activate` script provided by
+virtualenv. That does the usual virtualenv setup for your shell: running
+`python` will give you the virtual environments version, `pip list` will
+list all the packages installed in the virtual environment, and so on. Also
+as usual, type `deactivate` to restore your previous shell environment.
+
+See "Directories and Options" below for more information on the directory
+structure and how to change it.
+
+### Installing Dependencies
+
+If the virtual environment is not already set up and a `requirements.txt`
+file exists in the project directory (usually the same directory as the
+`pactivate` script), the modules listed there will be installed in the
+virtual environment after it's been created. That file uses the [standard
+format][req] accepted by `pip install -r`.
+
+If you modify `requirements.txt`, you can manually (re-)install the
+requirements with `.build/virtualenv/bin/pip install -r requirements.txt`.
+You may also simply remove the virtual environment with `rm -rf
+.build/virtualenv/` and let it rebuild the next time `pactivate` is run.
+
+### Test Scripts
+
+Typically you want to have a test script activate the virtual environment
+before running tests. Here's a sample script, called `Test`, that finds the
+project directory (assuming that it lives in the root of it), checks for a
+`-q` option to pass on to `pactivate` (ignoring any other options), and the
+sets up the environment before running the tests.
+
+    #!/usr/bin/env bash
+    set -eu -o pipefail     # Generally, fail on unchecked errors
+
+    #   Find the directory in which this script resides, allowing
+    #   this script to be run from any current working directory.
+    export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
+
+    #   Set `quiet=-q` if we have a -q in our command-line arguments.
+    args_words_regex="^($(IFS=\|; echo "$*"))$"   # -i -q → ^(-i|-q)$
+    quiet=; [[ -q =~ $args_words_regex ]] && quiet=-q
+
+    #   Set up and use the virtual environment using default paths:
+    #   • The project directory is the one in which `pactivate` resides.
+    #   • The build directory is `.build/` under the project directory,
+    #     with the Python virtual environment in `.build/virtualenv/`.
+    #   • Pass on `-q` for quiet mode if we were run with that.
+    source "$PROJDIR/pactivate" $quiet
+
+    #   Here we run the build, tests or whatever else we need to do.
+    pip --version           # Runs .build/virtualenv/bin/pip
+    cd "$PROJDIR"           # If you don't want to use absolute paths
+
+The developer can then type `./Test` (or whatever the appropriate relative
+or absolute path to it is) to run the build/tests/etc., with the Python
+virtual environment being created as necessary.
 
 
 Directories and Options
@@ -149,7 +227,10 @@ disguises the fact that they have full root access anyway.)
 
 
 <!-------------------------------------------------------------------->
+[`activate`]: https://virtualenv.pypa.io/en/latest/user_guide.html#activators
 [`pythonz`]: https://github.com/saghul/pythonz
 [`venv`]: https://docs.python.org/3/library/venv.html
 [docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
+[req]: https://pip.pypa.io/en/stable/reference/requirements-file-format/
+[source]: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-_002e
 [virtualenv]: https://virtualenv.pypa.io/
