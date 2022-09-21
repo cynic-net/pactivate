@@ -13,6 +13,16 @@ source. Note that some Linux distributions do not supply all of the base
 Python system in the standard package; with Debian for example you must
 install `python3-distutils` as well as `python3`.
 
+### Contents
+
+- Directories and Options
+- Theory of Operation
+- Developer Notes
+
+
+Directories and Options
+-----------------------
+
 `pactivate` needs to know the _project directory_ (PROJDIR) for your project
 (so it can find configuration files) and the _build directory_ under which
 it will store the bootstrap files and the virtual environment that it
