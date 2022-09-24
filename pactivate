@@ -1,4 +1,4 @@
-#   pactivate v0.2  https://github.com/0cjs/pactivate
+#   pactivate v0.3  https://github.com/0cjs/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -34,14 +34,14 @@ __pa_python=python3     # XXX should default to `py` for Windows
     __pa_cleanup; return 3
 }
 #   $__pa_pyver is empty for "modern" versions of Python (i.e., those that
-#   can use the current get-pip.py, 3.6 and above) and otherwise is the
+#   can use the current get-pip.py, 3.7 and above) and otherwise is the
 #   major.minor revision number, suitable for use in the URL to download
 #   an alternate version of get-pip.py.
 __pa_pyver=$("$__pa_python" -c '
 #   Reminder: this script must be compatible with Python 2 syntax.
 import sys
 M, m = sys.version_info[0], sys.version_info[1]     # Major, minor
-if (M < 3 or (M == 3 and m < 6)):
+if (M < 3 or (M == 3 and m < 7)):
     print("{}.{}".format(M, m))
 ')
 
