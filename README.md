@@ -173,7 +173,7 @@ before loading or executing any of the bootstrap files.
    appended to it. (This is necessary to avoid using the wrong version of
    Pip if the user changes to a different Python version after running the
    bootstrap once.)
-2. pactivate runs `git-pip.py`, directing it to install Pip to the
+2. pactivate runs `get-pip.py`, directing it to install Pip to the
    bootstrap directory. This also installs Pip's dependencies, `setuptools`
    and `wheel`.
 3. pactivate then uses that version of Pip to install the `virtualenv`
