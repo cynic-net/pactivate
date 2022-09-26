@@ -1,23 +1,30 @@
 pactivate
 =========
 
-`pactivate` is a script to build a Python virtualenv for a project that has
-no dependencies on any Python packages not distributed with Python itself,
-not even [Pip]. It completely ignores any Pip, [`virtualenv`] or other
-packages provided by the operating system distribution or in user-specific
-directories.
+`pactivate` is a dependency-free script to create a Python [virtualenv]
+for a project. (This documentation assumes you already know how to use
+`virtualenv` virtual environments.)
 
-The only requirement is Python itself, which may be supplied by your OS
-packaging system, [Pythonz], or a manual download and build of the Python
-source. Note that some Linux distributions do not supply all of the base
-Python system in the standard package; with Debian for example you must
-install `python3-distutils` as well as `python3`.
+It requires no modules outside of the standard library included with Python
+itself. In particular it does not require `pip` or `virtualenv` modules
+(and completely ignores any versions of those you may have installed in
+your system or user environment); `pactivate` bootstraps the virtual
+environment from the latest releases of these available on the Internet.
+The only dependency is a Python interpreter itself. (This may be supplied
+by your OS distribution, third-party packages, or your own build from
+source, e.g., with [`pythonz`].)
 
-Note that this does _not_ use the the [`venv`] module that became part of the
-Python standard library in version 3.3. Not only is `venv` not available in
-earlier versions of Python, but, as [described in the `virtualenv`
-documentation][virtualenv-doc], `venv` is a stripped-down (and slower)
-version of `virtualenv` that doesn't receive updates as often.
+Note that some Linux distributions, such as Debian and Ubuntu, do not
+supply the full set of standard libraries in their `python3` package. For
+these systems you may need to run `apt-get install python3-distutils` to
+add that standard library. (This depends on the Python version; it's
+required for 3.9 but not for 3.10.)
+
+This does _not_ use the the [`venv`] module that became part of the Python
+standard library in version 3.3. This is for two reasons: `venv` is not
+available in earlier versions of Python, such as 2.7; and, as [described in
+the `virtualenv` documentation][virtualenv], `venv` is a stripped-down (and
+slower) version of `virtualenv` that doesn't receive updates as often.
 
 ### Contents
 
@@ -142,9 +149,7 @@ disguises the fact that they have full root access anyway.)
 
 
 <!-------------------------------------------------------------------->
+[`pythonz`]: https://github.com/saghul/pythonz
 [`venv`]: https://docs.python.org/3/library/venv.html
-[`virtualenv`]: https://pypi.org/project/virtualenv/
 [docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
-[pip]: https://en.wikipedia.org/wiki/Pip_(package_manager)
-[pythonz]: https://github.com/saghul/pythonz
-[virtualenv-doc]: https://virtualenv.pypa.io/en/latest/
+[virtualenv]: https://virtualenv.pypa.io/
