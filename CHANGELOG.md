@@ -6,9 +6,14 @@ This file follows most, but not all, of the conventions described at
 notations for changes may include Added, Changed, Deprecated, Fixed,
 Removed, and Security.
 
-Version numbers are [_major.minor.patch_][semver].
+Version numbers are [_major.minor.patch_][semver]. On any change to
+pactivate itelf (not the tests), `-current` is appended to the version
+number and stays there until the next release, when `-curent` is removed
+and the version number is bumped. (Not all releases are tagged, but
+specific releases can also be fetched via the Git commit ID.)
 
-#### Unreleased
+#### -current
+- Fixed: Suppress several spurious warnings in pactivate.
 
 #### 0.3.1 2022-09-27
 - Fixed: No longer overwrite calling shell's $ve and $pa vars.
