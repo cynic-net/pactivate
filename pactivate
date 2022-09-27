@@ -1,4 +1,4 @@
-#   pactivate v0.3.0  https://github.com/0cjs/pactivate
+#   pactivate v0.3.1  https://github.com/0cjs/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -92,9 +92,11 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 }
 
 cmp -s $(type -p "$__pa_python") "$__pa_builddir/virtualenv/bin/python" || (
-    ve=$("$__pa_builddir"/virtualenv/bin/python --version 2>&1)
-    pa=$("$__pa_python" --version 2>&1)
-    echo 1>&2 "WARNING: virtualenv/bin/python ($ve) is not $__pa_python ($pa)"
+    echo 1>&2 "WARNING:" \
+        virtualenv/bin/python \
+        "($("$__pa_builddir"/virtualenv/bin/python --version 2>&1))" \
+        "is not $__pa_python" \
+        "($("$__pa_python" --version 2>&1))" \
     )
 
 . "$__pa_builddir"/virtualenv/*/activate

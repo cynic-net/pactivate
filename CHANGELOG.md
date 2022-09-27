@@ -10,6 +10,10 @@ Version numbers are [_major.minor.patch_][semver].
 
 #### Unreleased
 
+#### 0.3.1 2022-09-27
+- Fixed: No longer overwrite calling shell's $ve and $pa vars.
+  (This happened only rarely.)
+
 #### 0.3.0 2022-09-24
 - Fixed: For Python 3.6, use a versioned `get-pip.py` instead of the default
   (latest) version. This probably changed when 3.6 was deprecated.
