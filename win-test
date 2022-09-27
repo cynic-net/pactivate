@@ -46,6 +46,7 @@ build="$basedir/.win-test"
 winrm -rf "$build"
 
 bsve="$build/bootstrap/pactivate"
+bsve="$build/bootstrap/pactivate3.6"    # XXX
 virtualenv="$build/virtualenv"
 
 #   Set `quiet=-q` if we have a -q in our command-line arguments.
