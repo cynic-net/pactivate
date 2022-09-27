@@ -15,6 +15,10 @@ specific releases can also be fetched via the Git commit ID.)
 #### pactivate-current
 - Fixed: Support scripts installed by virtualenv under $venv/Scripts/ (as
   used on Windows) as well as $venv/bin/ (as used on Linux).
+- Test framework: Add `local-test` script to run a test in the current
+  environment, rather than a in Docker container. The build directory
+  for the test is `.local-test/`. This now allows testing under Windows
+  (though just for pactivate, not for pae).
 
 #### pae 0.8.2 (2024-01-24)
 - Fixed: Heisenbug involving `pae . python ...` not correctly setting up

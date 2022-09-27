@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+#   pactivate local-test - Run basic test on local machine
+#
+#   This runs a very basic test on the host system, with whatever
+#   configuration it happens to have, as opposed to the full set of tests
+#   in specific configurations run in a Docker container. It can be used
+#   to confirm operation on your own configuration of Linux and also test
+#   Mac and Windows, which cannot (currently) be tested with Docker.
+#
+#   XXX Much of this code is common with cont-test; perhaps we should
+#   extract some of the common elements.
+#
+
+####################################################################
+#   Test framework
+
+set -eu -o pipefail
+
+TEST_PASSED=false
+TEST_INTERACT=false         # Not in a container so we don't need this.
+trap '
+    ec=$?
+    $TEST_PASSED || echo "FAILURE: unexpected exit"
+    $TEST_INTERACT || exit $ec
+    echo "━━━━━ Entering interactive shell for debugging (last exit code=$ec)"
+    exec bash -l
+' 0
+
+fail() { echo FAILURE: "$@"; TEST_PASSED=true; exit 1; }
+
+winrm() {
+    #   On NTFS removing certain files too quickly after others will
+    #   generate an error. This hack sleeps and retries a few times.
+    local tries=5
+    while [[ $tries -gt 0 ]]; do
+        tries=$((tries - 1))
+        rm "$@" 2>/dev/null && return 0     # error messages suppressed
+        sleep 1
+    done
+    rm "$@"; return $?                      # this time show error
+}
+
+####################################################################
+#   Definitions and Functions
+
+basedir=$(cd "$(dirname "$0")" && pwd -P)
+build="$basedir/.local-test"
+virtualenv="$build/virtualenv"
+
+#   Set `quiet=-q` if we have a -q in our command-line arguments.
+args_words_regex="^($(IFS=\|; echo "$*"))$"   # -i -q → ^(-i|-q)$
+quiet=; [[ -q =~ $args_words_regex ]] && quiet=-q
+
+run_pactivate() {
+    (. "$basedir/pactivate" $quiet -b "$build")
+}
+
+####################################################################
+#   Tests
+
+echo '━━━━━ run pactivate clean'
+winrm -rf "$build"
+run_pactivate
+"$virtualenv"/[bS]*/pip --version || fail "pip --version didn't work"
+
+echo '━━━━━ TESTS COMPLETE'
+TEST_PASSED=true
