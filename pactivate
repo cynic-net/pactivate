@@ -1,4 +1,4 @@
-#   pactivate v0.3.1-current    https://github.com/0cjs/pactivate
+#   pactivate v0.4.0            https://github.com/0cjs/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -22,17 +22,31 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
-__pa_python=python3     # XXX should default to `py` for Windows
-#   Even if it's a dangling link (-e fails) we use it so that user sees error.
-[[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]] \
-    && __pa_python=$__pa_basedir/.python
-"$__pa_python" --version >/dev/null 2>&1 || {
-    [[ -L $__pa_python ]] \
-        && echo "$__pa_python -> $(readlink "$__pa_python")"
+#   Find the path to the Python interpreter to use.
+if [[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]]; then
+    #   -e returns false if .python is a dangling link. Even so, if the link
+    #   exists (-L returns true) we use it anyway so that the user can see
+    #   the error.
+    __pa_python=$__pa_basedir/.python
+elif [[ "${MSYSTEM:-}" =~ (MSYS|MINGW).* ]] && type -p py >/dev/null; then
+    #   We're on Windows with MINGW; find out its default interpreter.
+    __pa_python=$(py -c 'import sys; print(sys.executable)')
+elif type -p python3 >/dev/null; then
+    __pa_python=$(type -p python3)
+elif type -p python >/dev/null; then
+    __pa_python=$(type -p python)
+else
+    echo 1>&2 "Cannot find Python interpreter. Link .python to one."
+    return 3
+fi
+echo "Using: $__pa_python"
+#   Confirm the executable responds to the `--version` option.
+if ! "$__pa_python" --version >/dev/null 2>&1; then     # err msg suppressed
     $__pa_python --version || true      # Display the suppressed error message
-    echo 1>&2 "pactivate: bad python interpreter"
+    echo 1>&2 "pactivate: bad python interpreter: $__pa_python"
     __pa_cleanup; return 3
-}
+fi
+
 #   $__pa_pyver is empty for "modern" versions of Python (i.e., those that
 #   can use the current get-pip.py, 3.7 and above) and otherwise is the
 #   major.minor revision number, suitable for use in the URL to download
@@ -68,9 +82,11 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 [[ -d $__pa_bootdir/virtualenv/ ]] || {
     echo '----- Installing bootstrap virtualenv'
     #   This install produces spurious "bootstrap/.../bin already exists"
-    #   messages; --upgrade suppresses these.
-    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" \
-        $__pa_quiet install --upgrade -t "$__pa_bootdir" virtualenv
+    #   messages; --upgrade suppresses these. However, we can't use it on
+    #   Windows becuase there it, for mysterious reasons probably related
+    #   to NTFS, generates an error trying to unlink bin/pip.exe.
+    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" $__pa_quiet install \
+        $([[ ${MSYSTEM-} ]] || echo --upgrade) -t "$__pa_bootdir" virtualenv
 }
 
 [[ -d $__pa_builddir/virtualenv/ ]] || {
@@ -98,7 +114,7 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
         install $__pa_quiet -r "$__pa_requirements"
 }
 
-cmp -s $(type -p "$__pa_python") "$__pa_builddir"/virtualenv/[bS]*/python || (
+cmp "$__pa_python" "$__pa_builddir"/virtualenv/[bS]*/python || (
     echo 1>&2 "WARNING:" \
         "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
         "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \

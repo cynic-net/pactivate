@@ -45,8 +45,9 @@ basedir=$(cd "$(dirname "$0")" && pwd -P)
 build="$basedir/.win-test"
 winrm -rf "$build"
 
-bsve="$build/bootstrap/pactivate"
-bsve="$build/bootstrap/pactivate3.6"    # XXX
+#   $bsve is not set here because may include a version number at the end
+#   (if the test Python is ≤3.6). So we set it immediately after the install.
+#bsve="$build/bootstrap/pactivate"
 virtualenv="$build/virtualenv"
 
 #   Set `quiet=-q` if we have a -q in our command-line arguments.
@@ -62,6 +63,7 @@ run_pactivate() {
 
 echo '━━━━━ run pactivate clean'
 run_pactivate
+bsve="$(echo "$build"/bootstrap/pactivate*)"
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
 $virtualenv/Scripts/pip --version || fail "pip --version didn't work"

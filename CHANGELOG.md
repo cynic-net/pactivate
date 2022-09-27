@@ -13,6 +13,11 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 #### -current
+
+#### 0.4.0 2022-09-XXX
+- Added: Now runs on Windows using native Python in MINGW environments
+  (such as the Bash included in Git for Windows). Using the `.pactivate`
+  link to specify a specific interpreter is not yet supported, however.
 - Fixed: Suppress several spurious warnings in pactivate and Docker container.
 
 #### 0.3.1 2022-09-27

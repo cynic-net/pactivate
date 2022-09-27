@@ -20,8 +20,13 @@ these systems you may need to run `apt-get install python3-distutils` to
 add that standard library. (This depends on the Python version; it's
 required for 3.9 but not for 3.10.)
 
-This does _not_ use the the [`venv`] module that became part of the Python
-standard library in version 3.3. This is for two reasons: `venv` is not
+If used in a [MINGW] Windows environment (such as that provided by [Git for
+Windows][gfw]), `pactivate` will find a default Python using the [`py`]
+Python Launcher. (See below for how to set up `.python` links under
+Windows.)
+
+`pactivate` does _not_ use the the [`venv`] module that became part of the
+Python standard library in version 3.3. This is for two reasons: `venv` is not
 available in earlier versions of Python, such as 2.7; and, as [described in
 the `virtualenv` documentation][virtualenv], `venv` is a stripped-down (and
 slower) version of `virtualenv` that doesn't receive updates as often.
@@ -139,6 +144,14 @@ only to install a new virtualenv when there isn't an existing one. Changing
 this after the virtualenv has been built will not change the interpreter
 used in the existing virtualenv.
 
+__.python Link in Windows__
+
+Unfortunately, while symlinks are available in modern versions of Windows,
+they are [essentially unusable][gfw-symlinks] in most circumstances. (This
+is why Git Bash `ln -s` copies files by default.) The developers are
+currently considering other methods for specifying a specific Python
+interpreter under Windows.
+
 ### Command-line options
 
 - `-b BUILD`: Set the build dir
@@ -226,11 +239,16 @@ disguises the fact that they have full root access anyway.)
    setting in a calling script.
 
 
+
 <!-------------------------------------------------------------------->
+[MINGW]: https://en.wikipedia.org/wiki/Mingw-w64
 [`activate`]: https://virtualenv.pypa.io/en/latest/user_guide.html#activators
 [`pythonz`]: https://github.com/saghul/pythonz
 [`venv`]: https://docs.python.org/3/library/venv.html
 [docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
+[gfw-symlinks]: https://github.com/git-for-windows/git/wiki/Symbolic-Links
+[gfw]: https://gitforwindows.org/
+[py]: https://docs.python.org/3/using/windows.html#launcher
 [req]: https://pip.pypa.io/en/stable/reference/requirements-file-format/
 [source]: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-_002e
 [virtualenv]: https://virtualenv.pypa.io/
