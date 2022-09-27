@@ -126,7 +126,7 @@ ln -s /tmp/bin-python .python
 (. $pactivate -q 2>err-diffwarn && pip --version) \
     || fail "pip --version didn't work"
 echo 'Warning message was:'; cat err-diffwarn
-[[ $(cat err-diffwarn) =~ 'WARNING: virtualenv/bin/python (' ]] \
+[[ $(cat err-diffwarn) =~ 'WARNING: .build/virtualenv/bin/python (' ]] \
     || fail "line above is bad message"
 [[ $(cat err-diffwarn) =~ ') is not /test/.python (' ]] \
     || fail "line above is bad message"
