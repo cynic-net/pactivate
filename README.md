@@ -204,7 +204,8 @@ Developer Notes
 
 The tests are run with the `Test` script which sets up a Docker image and
 runs the tests in a container. You may be prompted for your sudo password
-to run Docker; see below for more information on this.
+to run Docker; if you don't want to use `sudo` you can create a `.no-sudo`
+file in the same directory. See below for more information on this.
 
 Options to `Test` must appear before any base image names. They are:
 - `-q`: Quiet mode. Produces significantly less output, but can make
@@ -234,10 +235,9 @@ accidentally use an existing installation of `pip` or `virtualenv`.
 
 ### Sudo for Docker
 
-The `Test` script runs `docker` with `sudo` and so will prompt for your
-sudo password if sudo requires one and your sudo credentials are not
-already cached. The `sudo` command can be removed if necessary for your
-situation.
+The `Test` script normally runs `docker` with `sudo` and so will prompt for
+your sudo password if sudo requires one and your sudo credentials are not
+already cached.
 
 The reason for using sudo is that not all system administrators use a
 `docker` group. Being able to control the Docker daemon with the `docker`
@@ -245,6 +245,10 @@ command [grants full root privileges to any user that can run
 it][docker-is-root], so some admins prefer to dispense with the `docker`
 group and just make it clear (via putting the user in the `sudo` group)
 that the user has root access.
+
+If you can't use `sudo` (or don't want to), `Test` can be configured not to
+use it by creating a file `.no-sudo` in the same directory as `Test`. (The
+contents of this file are ignored.)
 
 
 
