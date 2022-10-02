@@ -13,7 +13,10 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 #### -current
-- Fixed: Suppress several spurious warnings in pactivate and Docker container.
+`pactivate`:
+- Fixed: Suppress several spurious warnings.
+Test Framework:
+- Fixed: In Docker container, suppress Pip's warnings about running as root.
 
 #### 0.3.1 2022-09-27
 - Fixed: No longer overwrite calling shell's $ve and $pa vars.
