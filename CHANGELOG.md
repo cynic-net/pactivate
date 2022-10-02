@@ -18,6 +18,8 @@ specific releases can also be fetched via the Git commit ID.)
 Test Framework:
 - Fixed: In Docker container, suppress Pip's warnings about running as root.
 - Added: `Test` now runs docker without `sudo` if `.no-sudo` file present.
+- Added: (Linux) Docker container now started properly when `Test` is run
+  from MINGW Bash on Windows.
 
 #### 0.3.1 2022-09-27
 - Fixed: No longer overwrite calling shell's $ve and $pa vars.
