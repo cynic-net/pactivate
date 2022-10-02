@@ -19,6 +19,6 @@ sudo -v -p '[sudo] password for %p (to run docker): '
 
 echo "Building container (this may take a few moments)...."
 sudo docker build $TEST_QUIET -t "$IMG" .
-sudo docker run -it \
+sudo docker run --rm -it \
     -e "TEST_INTERACT=$TEST_INTERACT" -e "TEST_QUIET=$TEST_QUIET" \
     "$IMG" /test/cont-test
