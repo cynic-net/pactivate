@@ -202,21 +202,22 @@ works and some of the constraints it must deal with.
 Developer Notes
 ---------------
 
-The tests are run with `./Test`. You can use the `-q` option to produce
-significantly less output, but this usually makes idenitifying problems
-significantly more difficult. The `-i` option will start an interactive
-shell in the test container after the test completes or fails (the startup
-message will give the exit code indicating success or failure) to allow for
-interactive investigation of problems or simply playing with the script.
+The tests are run with the `Test` script which sets up a Docker image and
+runs the tests in a container. You may be prompted for your sudo password
+to run Docker; see below for more information on this.
+
+Options to `Test` must appear before any base image names. They are:
+- `-q`: Quiet mode. Produces significantly less output, but can make
+  identifying problems more difficult.
+- `-i`: Interactive mode. When the tests exit (whether via successful
+  completion or a failure) a shell is started in the test container. This
+  allows for interactive investigation of problems or simply playing with
+  the script.
 
 The tests are run in a Docker container to ensure that `pactivate` does not
-accidentally use an existing installation of `pip` or `virtualenv`. The
-`Test` script runs `docker` with `sudo` and so will first prompt for your
-sudo password if sudo requires one and your sudo credentials are not
-already cached. (The `docker` command [grants full root privileges to any
-user that can run it][docker-is-root], so you should not use a "docker"
-group; not granting sudo privileges to members of that group simply
-disguises the fact that they have full root access anyway.)
+accidentally use an existing installation of `pip` or `virtualenv`.
+
+### Implementation Notes and Gotchas
 
 `pactivate`, being sourced, runs in a special environment:
 1. We cannot use `exit` because that will exit the calling script (or worse
@@ -230,6 +231,21 @@ disguises the fact that they have full root access anyway.)
    also cannot use `trap` for any cleanup because a) we're only a fragment
    of a script, so we never exit, and b) it would override any `trap`
    setting in a calling script.
+
+### Sudo for Docker
+
+The `Test` script runs `docker` with `sudo` and so will prompt for your
+sudo password if sudo requires one and your sudo credentials are not
+already cached. The `sudo` command can be removed if necessary for your
+situation.
+
+The reason for using sudo is that not all system administrators use a
+`docker` group. Being able to control the Docker daemon with the `docker`
+command [grants full root privileges to any user that can run
+it][docker-is-root], so some admins prefer to dispense with the `docker`
+group and just make it clear (via putting the user in the `sudo` group)
+that the user has root access.
+
 
 
 <!-------------------------------------------------------------------->

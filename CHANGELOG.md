@@ -17,6 +17,7 @@ specific releases can also be fetched via the Git commit ID.)
 - Fixed: Suppress several spurious warnings.
 Test Framework:
 - Fixed: In Docker container, suppress Pip's warnings about running as root.
+- Added: `Test` now runs docker without `sudo` if `.no-sudo` file present.
 
 #### 0.3.1 2022-09-27
 - Fixed: No longer overwrite calling shell's $ve and $pa vars.
