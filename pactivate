@@ -1,4 +1,4 @@
-#   pactivate v0.3.2    https://github.com/0cjs/pactivate
+#   pactivate v0.3.3    https://github.com/0cjs/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -54,6 +54,14 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 
 [[ -x $__pa_bootdir/bin/pip ]] || {
     echo "----- Installing bootstrap pip (ver=${__pa_pyver:-latest})"
+    #   Debian-based systems do not incude distutils in the standard
+    #   python3 package; check that it's available and, if not, print a
+    #   more informative message than the ModuleNotFoundError.
+    "$__pa_python" -c 'import distutils.cmd' || {
+        echo 1>&2 \
+            "Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
+        return 3
+    }
     #   get-pip.py produces spurious upgrade notices on older Python versions
     #   such as 3.6 or 2.7; --disable-pip-version-check suppresses these.
     curl ${__pa_quiet:+--silent} \

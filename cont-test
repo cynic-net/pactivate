@@ -50,6 +50,21 @@ echo '━━━━━ unknown argument error'
 [[ 'pactivate: unknown argument: xyz' == $(cat err-args) ]] \
     || { cat err-args; fail "bad message"; }
 
+echo '━━━━━ run pactivate without distutils'
+if (. $pactivate -q 2>err-distutils); then
+    fail "expected error without python3-distutils"
+else
+    msg="Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
+    [[ $(cat err-distutils) == *$msg ]] \
+        || { cat err-distutils; fail "bad message"; }
+fi
+
+echo '━━━━━ installing distutils'
+apt-get -qq -y install python3-distutils >log-inst-distutils 2>&1 || {
+    cat log-inst-distutils
+    fail "apt-get install python3-distutils failed"
+}
+
 echo '━━━━━ run pactivate clean'
 #   This does the full bootstrap and virtualenv creation
 (. $pactivate)
