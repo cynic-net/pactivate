@@ -1,4 +1,4 @@
-#   pactivate v0.3.1-current    https://github.com/0cjs/pactivate
+#   pactivate v0.3.2    https://github.com/0cjs/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -59,7 +59,8 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
     curl ${__pa_quiet:+--silent} \
         "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \
         | "$__pa_python" - \
-            $__pa_quiet -t "$__pa_bootdir" --disable-pip-version-check
+            $__pa_quiet -t "$__pa_bootdir" --disable-pip-version-check \
+        || return $?
     PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" --version
 }
 
