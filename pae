@@ -1,12 +1,10 @@
-#   pae version 0.1.1   https://github.com/0cjs/pactivate
+#   pae version 0.2.0   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
 #
 #   Todo:
 #   - Bash completion of NAME argument.
-#   - `-r NAME COMMAND` option to run a command within a virtual environment
-#     (COMMAND should default to NAME if not provided.)
 #   - `-p PATH` option to select Python interpreter.
 #   - `-q` option
 #
@@ -16,10 +14,11 @@ __pae_url=https://raw.githubusercontent.com/0cjs/pactivate/main/pactivate
 __pae_usage() {
     cat <<_____
 Usage:
-    pae NAME        # activate a virtual environment
-    pae -c NAME     # create a virtual environment
-    pae -d          # deactivate the current virtual environment
-    pae -l          # list virtual environments in virtual environment home
+    pae NAME            # activate a virtual environment
+    pae -r NAME [CMD]   # run a command in a virtual environment (default NAME)
+    pae -d              # deactivate the current virtual environment
+    pae -l              # list virtual environments in virtual environment home
+    pae -c NAME         # create a virtual environment
 
 Virtual environments are normally stored in the "virtual environment home,"
 which is specified by the PAE_HOME environment variable. If that is not set
@@ -51,15 +50,16 @@ pae() {
             ls --ignore pactivate "$__pae_home"
             return 0
             ;;
+        -r) shift; __pae_command=run;;
         -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
             ;;
         *)  break;;
     esac; done
     if [[ ${#@} -eq 0 ]]; then
-        if [[ $__pae_command != deactivate ]]; then
+        if [[ $__pae_command != deactivate && $__pae_command != run ]]; then
             echo 1>&2 "pae: missing parameter (-h for help)"; return 2
         fi
-    elif [[ ${#@} -ne 1 ]]; then
+    elif [[ ${#@} -ne 1 && $__pae_command != run ]]; then
         echo 1>&2 "pae: too many parameters:" "$@"; return 2
     else
         __pae_vdir="$1"                 # assume directory...
@@ -81,6 +81,20 @@ pae() {
                 . "$__pae_vdir/bin/activate"    # compatibility mode
             else
                 echo 1>&2 "pae: cannot find $__pae_vdir/bin/activate"
+            fi
+            ;;
+        run)
+            if [[ ${#@} -eq 0 ]]; then
+                __pae_run="$(basename "$__pae_vdir")"
+            else
+                __pae_run="$1"; shift
+            fi
+            if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
+                "$__pae_vdir/.build/virtualenv/bin/$__pae_run" "$@"
+            elif [[ -r $__pae_vdir/bin/activate ]]; then
+                "$__pae_vdir/bin/$__pae_run" "$@"
+            else
+                echo 1>&2 "pae: cannot find virtual environment in $__pae_vdir"
             fi
             ;;
         deactivate)
