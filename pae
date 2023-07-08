@@ -1,0 +1,112 @@
+#   pae version 0.1.0   https://github.com/0cjs/pactivate
+#
+#   pae provides pactivate-based commands similar to virtualenvwrapper.
+#   See the __pae_usage() function below for full documentation.
+#
+#   Todo:
+#   - `-l` option to list virtual environments in $PAE_HOME.
+#   - Bash completion of NAME argument.
+#   - `-r NAME COMMAND` option to run a command within a virtual environment
+#     (COMMAND should default to NAME if not provided.)
+#   - `-p PATH` option to select Python interpreter.
+#   - `-q` option
+#
+
+__pae_url=https://raw.githubusercontent.com/0cjs/pactivate/main/pactivate
+
+__pae_usage() {
+    cat <<_____
+Usage:
+    pae NAME        # activate a virtual environment
+    pae -c NAME     # create a virtual environment
+    pae -d          # deactivate the current virtual environment
+
+Virtual environments are normally stored in the "virtual environment home,"
+which is specified by the PAE_HOME environment variable. If that is not set
+it falls back to WORKON_HOME for virtualenvwrapper compatibility, and
+then ~/.pyvirtenv. Howwever specifying a NAME parameter with a slash in it
+will instead use the exact path specified. (Use ./NAME to use a directory
+under the current working directory.)
+
+This creates new virtual environments using pactivate, with the virtual
+environment in the usual place in .build/virtualenv/ under the directory
+or name given. However, for backward compatibility with virtualenvwrapper
+it will also activate and deactivate any name/directory that directly
+contains a virtual environment built with virtualenv.
+_____
+}
+
+pae() {
+    if   [[ -v PAE_HOME ]]; then    __pae_home="$PAE_HOME"
+    elif [[ -v WORKON_HOME ]];then  __pae_home="$WORKON_HOME"
+    else                            __pae_home=~/.pyvirtenv
+    fi
+
+    __pae_command=activate
+    while [[ ${#@} -gt 0 ]]; do case "$1" in
+        -c) shift; __pae_command=create;;
+        -d) shift; __pae_command=deactivate;;
+        -h) __pae_usage; return 0;;
+        -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
+            ;;
+        *)  break;;
+    esac; done
+    if [[ ${#@} -eq 0 ]]; then
+        if [[ $__pae_command != deactivate ]]; then
+            echo 1>&2 "pae: missing parameter (-h for help)"; return 2
+        fi
+    elif [[ ${#@} -ne 1 ]]; then
+        echo 1>&2 "pae: too many parameters:" "$@"; return 2
+    else
+        __pae_vdir="$1"                 # assume directory...
+        [[ $1 == ${1##*/} ]] && {       # ...unless no slash in arg
+            [[ $1 == . || $1 == .. ]] && {
+                echo 1>&2 "pae: bad virtalenv name: $1"
+                return 2
+            }
+            __pae_vdir="$__pae_home/$1"
+        }
+        shift                           # remove last param
+    fi
+
+    case $__pae_command in
+        activate)
+            if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
+                . "$__pae_home/pactivate" -B "$__pae_vdir"
+            elif [[ -r $__pae_vdir/bin/activate ]]; then
+                . "$__pae_vdir/bin/activate"    # compatibility mode
+            else
+                echo 1>&2 "pae: cannot find $__pae_vdir/bin/activate"
+            fi
+            ;;
+        deactivate)
+            if [[ $(type -t deactivate) == function ]]; then
+                deactivate
+            else
+                echo 1>&2 "pae: no deactivate(); not in a virtual environment?"
+                return 1
+            fi
+            ;;
+        create)
+            [[ -e $__pae_vdir/.build/virtualenv/bin/activate \
+               || -e $__pae_vdir/bin/activate ]] \
+            && {
+                echo 1>&2 "pae: virtual environment already exists in $__pae_vdir"
+                return 3
+            }
+            [[ -r "$__pae_home/pactivate" ]] || {
+                echo "Downloading pactivate..."
+                curl --fail \
+                    --create-dirs --output "$__pae_home/pactivate" \
+                    "$__pae_url" \
+                || { echo 1>&2 "pae: can't download pactivate"; return 22; }
+            }
+            mkdir -p "$__pae_vdir"
+            cat >"$__pae_vdir/README" <<_____
+.build/virtualenv/ is a pactivate environment created by pae.
+For more information, see https://github.com/0cjs/pactivate
+_____
+            . "$__pae_home/pactivate" -B "$__pae_vdir"
+            ;;
+    esac
+}
