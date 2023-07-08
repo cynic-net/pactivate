@@ -1,10 +1,9 @@
-#   pae version 0.1.0   https://github.com/0cjs/pactivate
+#   pae version 0.1.1   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
 #
 #   Todo:
-#   - `-l` option to list virtual environments in $PAE_HOME.
 #   - Bash completion of NAME argument.
 #   - `-r NAME COMMAND` option to run a command within a virtual environment
 #     (COMMAND should default to NAME if not provided.)
@@ -20,6 +19,7 @@ Usage:
     pae NAME        # activate a virtual environment
     pae -c NAME     # create a virtual environment
     pae -d          # deactivate the current virtual environment
+    pae -l          # list virtual environments in virtual environment home
 
 Virtual environments are normally stored in the "virtual environment home,"
 which is specified by the PAE_HOME environment variable. If that is not set
@@ -47,6 +47,10 @@ pae() {
         -c) shift; __pae_command=create;;
         -d) shift; __pae_command=deactivate;;
         -h) __pae_usage; return 0;;
+        -l) shift;
+            ls --ignore pactivate "$__pae_home"
+            return 0
+            ;;
         -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
             ;;
         *)  break;;
