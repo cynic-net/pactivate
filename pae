@@ -1,4 +1,4 @@
-#   pae version 0.3.0   https://github.com/0cjs/pactivate
+#   pae version 0.3.1   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -8,6 +8,12 @@
 #   - `-p PATH` option to select Python interpreter.
 #   - `-q` option
 #
+
+[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
+#   https://stackoverflow.com/a/28776166/107294
+(return 0 2>/dev/null) \
+    || { echo 1>&2 "source (.) pae with Bash."; exit 9; }
+
 
 __pae_url=https://raw.githubusercontent.com/0cjs/pactivate/main/pactivate
 
