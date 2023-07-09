@@ -1,4 +1,4 @@
-#   pae version 0.4.0   https://github.com/0cjs/pactivate
+#   pae version 0.4.1   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -22,7 +22,7 @@ Usage:
     pae [-r] NAME [CMD] ... # run a command (default NAME) in a virtual env
     pae -a NAME             # activate a virtual env
     pae -d                  # deactivate the current virtual env
-    pae -l                  # list virtual env in virtual env home
+    pae -l                  # list virtual env dirs in virtual env home
     pae -c NAME             # create a virtual env
 
 All commands also accept the following options:
@@ -44,80 +44,82 @@ _____
 }
 
 pae() {
-    #   $__pae_home: default virtual environments location
-    if   [[ -v PAE_HOME ]]; then    __pae_home="$PAE_HOME"
-    elif [[ -v WORKON_HOME ]];then  __pae_home="$WORKON_HOME"
-    else                            __pae_home=~/.pyvirtenv
+    local pae_home quiet action vedir bindir bincmd
+
+    #   $pae_home: default virtual environments location
+    if   [[ -v PAE_HOME ]]; then      pae_home="$PAE_HOME"
+    elif [[ -v WORKON_HOME ]];then    pae_home="$WORKON_HOME"
+    else                              pae_home=~/.pyvirtenv
     fi
 
-    #   $__pae_action: parse command line arguments
-    __pae_quiet=-q
-    __pae_action=run
+    #   $action: parse command line arguments
+    quiet=-q
+    action=run
     while [[ ${#@} -gt 0 ]]; do case "$1" in
-        -a) shift; __pae_action=activate;;
-        -c) shift; __pae_action=create;;
-        -d) shift; __pae_action=deactivate;;
+        -a) shift; action=activate;;
+        -c) shift; action=create;;
+        -d) shift; action=deactivate;;
         -h) __pae_usage; return 0;;
         -l) shift;
-            ls --ignore pactivate "$__pae_home"
+            ls --ignore pactivate "$pae_home"
             return 0
             ;;
-        -r) shift; __pae_action=run;;
-        -v) shift; __pae_quiet='';;
+        -r) shift; action=run;;
+        -v) shift; quiet='';;
         -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
             ;;
         *)  break;;
     esac; done
     if [[ ${#@} -eq 0 ]]; then
-        if [[ $__pae_action != deactivate && $__pae_action != run ]]; then
+        if [[ $action != deactivate && $action != run ]]; then
             echo 1>&2 "pae: missing parameter (-h for help)"; return 2
         fi
-    elif [[ ${#@} -ne 1 && $__pae_action != run ]]; then
+    elif [[ ${#@} -ne 1 && $action != run ]]; then
         echo 1>&2 "pae: too many parameters:" "$@"; return 2
     else
-        __pae_vdir="$1"                 # assume directory...
+        vedir="$1"                      # assume directory...
         [[ $1 == ${1##*/} ]] && {       # ...unless no slash in arg
             [[ $1 == . || $1 == .. ]] && {
                 echo 1>&2 "pae: bad virtalenv name: $1"
                 return 2
             }
-            __pae_vdir="$__pae_home/$1"
+            vedir="$pae_home/$1"
         }
         shift                           # remove last param
     fi
 
-    case $__pae_action in
+    case $action in
         run)
-            #   $__pae_bin: confirm virtual env exists and find its bin dir.
-            if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
-                __pae_bin="$__pae_vdir/.build/virtualenv/bin"
-            elif [[ -r $__pae_vdir/bin/activate ]]; then
+            #   $bindir: confirm virtual env exists and find its bin dir.
+            if [[ -r $vedir/.build/virtualenv/bin/activate ]]; then
+                bindir="$vedir/.build/virtualenv/bin"
+            elif [[ -r $vedir/bin/activate ]]; then
                 #   Backwards compatibility with virtualenvwrapper.
-                __pae_bin="$__pae_vdir/bin"
+                bindir="$vedir/bin"
             else
-                echo 1>&2 "pae: $__pae_vdir does not appear to be a virtual env"
+                echo 1>&2 "pae: $vedir does not appear to be a virtual env"
                 return 1
             fi
             #   Find and run the command.
-            if [[ ${#@} -ge 1 && -x "$__pae_bin/$1" ]]; then
+            if [[ ${#@} -ge 1 && -x "$bindir/$1" ]]; then
                 #   First arg is an exectuable in bin
-                __pae_bin_command="$1"
+                bincmd="$1"
                 shift
             else
                 #   Assume that virtual env name is also command name.
-                __pae_bin_command="$(basename "$__pae_vdir")"
+                bincmd="$(basename "$vedir")"
             fi
-            [[ -z $__pae_quiet ]] \
-                && echo "pae: running $__pae_bin_command from $__pae_bin"
-            "$__pae_bin/$__pae_bin_command" "$@"
+            [[ -z $quiet ]] \
+                && echo "pae: running $bincmd from $bindir"
+            "$bindir/$bincmd" "$@"
             ;;
         activate)
-            if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
-                . "$__pae_home/pactivate" $__pae_quiet -B "$__pae_vdir"
-            elif [[ -r $__pae_vdir/bin/activate ]]; then
-                . "$__pae_vdir/bin/activate"    # compatibility mode
+            if [[ -r $vedir/.build/virtualenv/bin/activate ]]; then
+                . "$pae_home/pactivate" $quiet -B "$vedir"
+            elif [[ -r $vedir/bin/activate ]]; then
+                . "$vedir/bin/activate"    # compatibility mode
             else
-                echo 1>&2 "pae: $__pae_vdir does not appear to be a virtual env"
+                echo 1>&2 "pae: $vedir does not appear to be a virtual env"
                 return 1
             fi
             ;;
@@ -130,25 +132,25 @@ pae() {
             fi
             ;;
         create)
-            [[ -e $__pae_vdir/.build/virtualenv/bin/activate \
-               || -e $__pae_vdir/bin/activate ]] \
+            [[ -e $vedir/.build/virtualenv/bin/activate \
+               || -e $vedir/bin/activate ]] \
             && {
-                echo 1>&2 "pae: virtual environment already exists in $__pae_vdir"
+                echo 1>&2 "pae: virtual environment already exists in $vedir"
                 return 3
             }
-            [[ -r "$__pae_home/pactivate" ]] || {
+            [[ -r "$pae_home/pactivate" ]] || {
                 echo "Downloading pactivate..."
                 curl --fail --show-error ${__pa_quiet:+--silent} \
-                    --create-dirs --output "$__pae_home/pactivate" \
+                    --create-dirs --output "$pae_home/pactivate" \
                     "$__pae_url" \
                 || { echo 1>&2 "pae: can't download pactivate"; return 22; }
             }
-            mkdir -p "$__pae_vdir"
-            cat >"$__pae_vdir/README" <<_____
+            mkdir -p "$vedir"
+            cat >"$vedir/README" <<_____
 .build/virtualenv/ is a pactivate environment created by pae.
 For more information, see https://github.com/0cjs/pactivate
 _____
-            . "$__pae_home/pactivate" $__pae_quiet -B "$__pae_vdir"
+            . "$pae_home/pactivate" $quiet -B "$vedir"
             ;;
     esac
 }
