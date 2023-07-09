@@ -1,4 +1,4 @@
-#   pae version 0.2.1   https://github.com/0cjs/pactivate
+#   pae version 0.2.2   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -76,16 +76,6 @@ pae() {
     fi
 
     case $__pae_command in
-        activate)
-            if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
-                . "$__pae_home/pactivate" -B "$__pae_vdir"
-            elif [[ -r $__pae_vdir/bin/activate ]]; then
-                . "$__pae_vdir/bin/activate"    # compatibility mode
-            else
-                echo 1>&2 "pae: $__pae_vdir does not appear to be a virtual env"
-                return 1
-            fi
-            ;;
         run)
             #   $__pae_bin: confirm virtual env exists and find its bin dir.
             if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
@@ -107,6 +97,16 @@ pae() {
                 __pae_bin_command="$(basename "$__pae_vdir")"
             fi
             "$__pae_bin/$__pae_bin_command" "$@"
+            ;;
+        activate)
+            if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
+                . "$__pae_home/pactivate" -B "$__pae_vdir"
+            elif [[ -r $__pae_vdir/bin/activate ]]; then
+                . "$__pae_vdir/bin/activate"    # compatibility mode
+            else
+                echo 1>&2 "pae: $__pae_vdir does not appear to be a virtual env"
+                return 1
+            fi
             ;;
         deactivate)
             if [[ $(type -t deactivate) == function ]]; then
