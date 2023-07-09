@@ -1,4 +1,4 @@
-#   pae version 0.3.1   https://github.com/0cjs/pactivate
+#   pae version 0.3.2   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -26,6 +26,9 @@ Usage:
     pae -l                  # list virtual env in virtual env home
     pae -c NAME             # create a virtual env
 
+All commands also accept the following options:
+    -v          Verbose mode; otherwise we try to run as quietly as possible.
+
 Virtual environments are normally stored in the "virtual environment home,"
 which is specified by the PAE_HOME environment variable. If that is not set
 it falls back to WORKON_HOME for virtualenvwrapper compatibility, and
@@ -49,6 +52,7 @@ pae() {
     fi
 
     #   $__pae_command: parse command line arguments
+    __pae_quiet=-q
     __pae_command=run
     while [[ ${#@} -gt 0 ]]; do case "$1" in
         -a) shift; __pae_command=activate;;
@@ -60,6 +64,7 @@ pae() {
             return 0
             ;;
         -r) shift; __pae_command=run;;
+        -v) shift; __pae_quiet='';;
         -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
             ;;
         *)  break;;
@@ -103,11 +108,13 @@ pae() {
                 #   Assume that virtual env name is also command name.
                 __pae_bin_command="$(basename "$__pae_vdir")"
             fi
+            [[ -z $__pae_quiet ]] \
+                && echo "pae: running $__pae_bin_command from $__pae_bin"
             "$__pae_bin/$__pae_bin_command" "$@"
             ;;
         activate)
             if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
-                . "$__pae_home/pactivate" -B "$__pae_vdir"
+                . "$__pae_home/pactivate" $__pae_quiet -B "$__pae_vdir"
             elif [[ -r $__pae_vdir/bin/activate ]]; then
                 . "$__pae_vdir/bin/activate"    # compatibility mode
             else
@@ -132,7 +139,7 @@ pae() {
             }
             [[ -r "$__pae_home/pactivate" ]] || {
                 echo "Downloading pactivate..."
-                curl --fail \
+                curl --fail --show-error ${__pa_quiet:+--silent} \
                     --create-dirs --output "$__pae_home/pactivate" \
                     "$__pae_url" \
                 || { echo 1>&2 "pae: can't download pactivate"; return 22; }
@@ -142,7 +149,7 @@ pae() {
 .build/virtualenv/ is a pactivate environment created by pae.
 For more information, see https://github.com/0cjs/pactivate
 _____
-            . "$__pae_home/pactivate" -B "$__pae_vdir"
+            . "$__pae_home/pactivate" $__pae_quiet -B "$__pae_vdir"
             ;;
     esac
 }
