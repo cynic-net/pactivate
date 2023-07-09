@@ -1,4 +1,4 @@
-#   pae version 0.3.2   https://github.com/0cjs/pactivate
+#   pae version 0.3.3   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -6,7 +6,6 @@
 #   Todo:
 #   - Bash completion of NAME argument.
 #   - `-p PATH` option to select Python interpreter.
-#   - `-q` option
 #
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
@@ -51,29 +50,29 @@ pae() {
     else                            __pae_home=~/.pyvirtenv
     fi
 
-    #   $__pae_command: parse command line arguments
+    #   $__pae_action: parse command line arguments
     __pae_quiet=-q
-    __pae_command=run
+    __pae_action=run
     while [[ ${#@} -gt 0 ]]; do case "$1" in
-        -a) shift; __pae_command=activate;;
-        -c) shift; __pae_command=create;;
-        -d) shift; __pae_command=deactivate;;
+        -a) shift; __pae_action=activate;;
+        -c) shift; __pae_action=create;;
+        -d) shift; __pae_action=deactivate;;
         -h) __pae_usage; return 0;;
         -l) shift;
             ls --ignore pactivate "$__pae_home"
             return 0
             ;;
-        -r) shift; __pae_command=run;;
+        -r) shift; __pae_action=run;;
         -v) shift; __pae_quiet='';;
         -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
             ;;
         *)  break;;
     esac; done
     if [[ ${#@} -eq 0 ]]; then
-        if [[ $__pae_command != deactivate && $__pae_command != run ]]; then
+        if [[ $__pae_action != deactivate && $__pae_action != run ]]; then
             echo 1>&2 "pae: missing parameter (-h for help)"; return 2
         fi
-    elif [[ ${#@} -ne 1 && $__pae_command != run ]]; then
+    elif [[ ${#@} -ne 1 && $__pae_action != run ]]; then
         echo 1>&2 "pae: too many parameters:" "$@"; return 2
     else
         __pae_vdir="$1"                 # assume directory...
@@ -87,7 +86,7 @@ pae() {
         shift                           # remove last param
     fi
 
-    case $__pae_command in
+    case $__pae_action in
         run)
             #   $__pae_bin: confirm virtual env exists and find its bin dir.
             if [[ -r $__pae_vdir/.build/virtualenv/bin/activate ]]; then
