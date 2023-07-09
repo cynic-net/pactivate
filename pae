@@ -1,4 +1,4 @@
-#   pae version 0.3.3   https://github.com/0cjs/pactivate
+#   pae version 0.4.0   https://github.com/0cjs/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -152,3 +152,97 @@ _____
             ;;
     esac
 }
+
+__pae_debug() {
+    echo >>~/tmp/pae.debug "$@"
+}
+
+__pae_complete() {
+    local debug=':'
+   #local debug='__pae_debug'       # uncomment to enable debugging
+    $debug
+    $debug "1=$1 2=$2 3=$3 COMP_CWORD=$COMP_CWORD"
+    $debug "COMP_WORDS=${COMP_WORDS[@]}"
+
+    #   $pae_home: default virtual environments location
+    local pae_home
+    if   [[ -v PAE_HOME ]]; then    pae_home="$PAE_HOME"
+    elif [[ -v WORKON_HOME ]]; then pae_home="$WORKON_HOME"
+    else                            pae_home=~/.pyvirtenv
+    fi
+
+    local command="$1" word="$2" prevword="$3"
+    local vepath vebase i
+
+    #   Determine commpletion state from previous words on command line.
+    #     =0: completing options or virtual env name
+    #     =1: we have virtual env name; completing executable
+    #     ≥2: we have executable; completing options to it
+    local cstate=0                  # completing options or virtual env name
+    for i in $(seq 0 $(($COMP_CWORD - 1)) ); do
+        $debug "state $cstate check $i: ${COMP_WORDS[i]}"
+        #   If we're at the start; stay in state 0.
+        [[ $i -eq 0 ]] && continue                      # at start of command
+        [[ ${COMP_WORDS[$i]} =~ ^- ]] && continue       # going through options
+        #   found a non-option; must be virtual env name or path
+        [[ -z $vepath ]] && {
+            #   the first one we come across is virtual env name or path
+            $debug "stripped=${COMP_WORDS[$i]#*/}"
+            if [[ ${COMP_WORDS[$i]#*/} != ${COMP_WORDS[$i]} ]]; then
+                vepath="${COMP_WORDS[$i]}"  # has a slash; must be path
+            else
+                vepath="$pae_home/${COMP_WORDS[$i]}"
+            fi
+            $debug "vepath=$vepath"
+        }
+        cstate=$(($cstate + 1))                         # passed a non-option
+    done
+    $debug "state $cstate"
+
+    if [[ $cstate -eq 0 && $word =~ ^- ]]; then
+        #   pae option.
+        mapfile -t COMPREPLY < <(compgen -W "-r -a -d -c -v" -- "$word")
+    elif [[ $cstate -eq 0 ]]; then
+        #   Virtual env name or path
+        COMPREPLY=()
+        $debug "glob:" "$pae_home/$2"*
+        if [[ ${word#*/} == $word ]]; then
+            #   No slashes; complete from $pae_home
+            for vepath in "$pae_home/$word"*; do
+                vebase="$(basename "$vepath")"
+                [[ $vebase == pactivate ]] && continue
+                COMPREPLY+=("$vebase")
+            done
+        else
+            #   word has slashes; standard filename completion
+            for i in $(compgen -G "${word}*"); do
+                COMPREPLY+=("$i")
+            done
+        fi
+    elif [[ $cstate -eq 1 ]]; then
+        $debug "cstate=2 vepath=$vepath"
+        local vebin
+        for vebin in "$vepath/.build/virtualenv/bin" "$vepath/bin" ""; do
+            $debug "vebin check: $vebin"
+            [[ -r $vebin/activate ]] && break
+        done
+        $debug "vebin=$vebin"
+        if [[ -z $vebin ]]; then
+            #   not a virtual env
+            unset COMPREPLY
+        else
+            COMPREPLY=()
+            for i in "$vebin/"*; do
+                [[ ! -x $i && ! -L $i ]] && continue    # not executable
+                i="$(basename "$i")"
+                [[ $i == ${word}* ]] && COMPREPLY+=( "$(basename "$i")" )
+            done
+        fi
+    else
+        #   TODO: re-use the comspec for the exectuable in virtualenv  if
+        #   available
+        unset COMPREPLY
+    fi
+    $debug "COMP_REPLY=${COMPREPLY[@]}"
+}
+complete -F __pae_complete pae
