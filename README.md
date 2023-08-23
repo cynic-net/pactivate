@@ -53,9 +53,9 @@ performing its other actions. For example:
 
     $ git init myproject
     $ cd myproject
-    $ curl -O https://raw.githubusercontent.com/0cjs/pactivate/main/pactivate
+    $ curl -O https://raw.githubusercontent.com/cynic-net/pactivate/main/pactivate
     $ git add pactivate
-    $ git commit -m 'pactivate: from https://github.com/0cjs/pactivate'
+    $ git commit -m 'pactivate: from https://github.com/cynic-net/pactivate'
 
 At this point you can [source] `pactivate` just as you would the
 [`activate`] script from virtualenv to modify your shell environment to be
