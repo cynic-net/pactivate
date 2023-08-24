@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+output=
+TEST_PASSED=false
+trap '  ec=$?
+        $TEST_PASSED || {
+            echo "FAILURE: unexpected exit; code=$ec"
+            echo -e  "Last output:\n  $output"
+        }
+' 0
+
+fail() { echo -e FAILURE: "$@"; TEST_PASSED=true; exit 1; }
+
+####################################################################
+#   Setup
+
+export PROJDIR=$(cd "$(dirname "$0")/.." && pwd -P)
+
+TEST_QUIET=             # -q if we are running tests as quietly as possible
+while [[ $# -gt 0 ]]; do case "$1" in
+    -q)     shift; TEST_QUIET=-q;;
+    *)      echo 1>&2 "$0: Unknown argument: $1"; exit 2;;
+esac; done
+
+export PAE_HOME="$PROJDIR"/.build/test/pae
+rm -rf "$PAE_HOME"; mkdir -p "$PAE_HOME"
+. "$PROJDIR"/pae
+cd /    # Ensure we're not dependent on CWD
+
+####################################################################
+#   Tests
+
+echo '━━━━━ no arguments error'
+if output=$(2>&1 pae); then
+    fail "Accepted no args."
+else
+    [[ $output =~ "missing parameter"  ]] \
+        || fail "bad message:\n  $output"
+fi
+
+echo '━━━━━ pae -h'
+output=$(pae -h)
+[[ $output =~ "Usage:"  ]] \
+    || fail "bad message: $output"
+
+echo '━━━━━ pae -D'
+(   cd $PAE_HOME
+    rm -f pactivate
+    pae -D
+    ls -l pactivate
+    test -s pactivate
+) || fail "Failed to download pactivate"
+
+echo '━━━━━ pae nonexistent'
+if output=$(2>&1 pae nonexistent); then
+    fail 'Accepted nonexistent virtual env.'
+else
+    [[ $output =~ 'does not appear to be a virtual env' ]] \
+        || fail "bad message:\n  $output"
+fi
+
+echo '━━━━━ pae -c te0'
+output=$(2>&1 pae -c te0)
+[[ -r "$PAE_HOME"/te0/.build/virtualenv/pyvenv.cfg ]] \
+    || fail 'no pyenv.cfg'
+
+echo '━━━━━ pae -l'
+output=$(2>&1 pae -l)
+[[ $output == 'te0' ]] || fail "bad listing:\n  $output"
+
+echo '━━━━━ pae -a te0'
+pae -a te0
+[[ $(type python) =~ /te0/.build/virtualenv/bin/python$ ]] \
+    || fail "Python at wrong path: $(type python)"
+
+echo '━━━━━ pae -d'
+pae -d
+[[ $(type python 2>/dev/null) =~ /te0/.build/virtualenv ]] \
+    && fail "Python at wrong path: $(type python)"
+
+echo '━━━━━ pae -d # not activated'
+output=$(2>&1 pae -d) || true
+[[ $output =~ 'no deactivate()' ]] || fail "bad output:\n  $output"
+
+echo '━━━━━ pae --rm te0'
+output=$(2>&1 pae --rm te0)
+[[ -e "$PAE_HOME"/te0 ]] && fail 'environment not removed'
+
+echo '━━━━━ TESTS COMPLETE'
+TEST_PASSED=true
