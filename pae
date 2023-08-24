@@ -56,19 +56,19 @@ pae() {
     quiet=-q
     action=run
     while [[ ${#@} -gt 0 ]]; do case "$1" in
-        -a) shift; action=activate;;
-        -c) shift; action=create;;
-        -d) shift; action=deactivate;;
-        -h) __pae_usage; return 0;;
-        -l) shift;
-            ls --ignore pactivate "$pae_home"
-            return 0
-            ;;
-        -r) shift; action=run;;
-        -v) shift; quiet='';;
-        -*) echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
-            ;;
-        *)  break;;
+        -a)     shift; action=activate;;
+        -c)     shift; action=create;;
+        -d)     shift; action=deactivate;;
+        -h)     __pae_usage; return 0;;
+        -l)     shift;
+                ls --ignore pactivate "$pae_home"
+                return 0
+                ;;
+        -r)     shift; action=run;;
+        -v)     shift; quiet='';;
+        -*)     echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
+                ;;
+        *)      break;;
     esac; done
     if [[ ${#@} -eq 0 ]]; then
         [[ $action == deactivate ]] || {
