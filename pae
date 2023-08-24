@@ -1,4 +1,4 @@
-#   pae version 0.5.1   https://github.com/cynic-net/pactivate
+#   pae version 0.5.2   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -29,6 +29,8 @@ Usage:
     pae --rm NAME           # remove a virtual env created by pae
                             #   (this will not remove non-pae files)
     pae -U                  # update the pactivate used by this function
+    pae -D                  # download latest version of pactivate
+                            #   to the current working directory
 
 All commands also accept the following options:
     -v          Verbose mode; otherwise we try to run as quietly as possible.
@@ -92,6 +94,7 @@ pae() {
         -r)     shift; action=run;;
         --rm)   shift; action=remove;;
         -U)     __pae_update_pactivate "$pae_home"; return 0;;
+        -D)     __pae_update_pactivate .; return 0;;
         -v)     shift; quiet='';;
         -*)     echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
                 ;;
