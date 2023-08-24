@@ -1,4 +1,4 @@
-#   pae version 0.4.2   https://github.com/cynic-net/pactivate
+#   pae version 0.4.3   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -139,7 +139,7 @@ pae() {
             }
             [[ -r "$pae_home/pactivate" ]] || {
                 echo "Downloading pactivate..."
-                curl --fail --show-error ${__pa_quiet:+--silent} \
+                curl --fail --show-error '-#' ${quiet:+--silent} \
                     --create-dirs --output "$pae_home/pactivate" \
                     "$__pae_pactivate_url" \
                 || { echo 1>&2 "pae: can't download pactivate"; return 22; }
