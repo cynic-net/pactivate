@@ -57,6 +57,9 @@ performing its other actions. For example:
     $ git add pactivate
     $ git commit -m 'pactivate: from https://github.com/cynic-net/pactivate'
 
+(Note that the `curl` command above can be replaced with `pae -D` if you
+are using `pae`.)
+
 At this point you can [source] `pactivate` just as you would the
 [`activate`] script from virtualenv to modify your shell environment to be
 using the Python virtual environment:
@@ -66,9 +69,10 @@ using the Python virtual environment:
 This will build a virtual environment in `.build/virtualenv/` if necessary
 and then source the `.build/virtualenv/*/activate` script provided by
 virtualenv. That does the usual virtualenv setup for your shell: running
-`python` will give you the virtual environments version, `pip list` will
+`python` will give you the virtual environment's version, `pip list` will
 list all the packages installed in the virtual environment, and so on. Also
-as usual, type `deactivate` to restore your previous shell environment.
+as usual, type `deactivate` (or `pae -d`) to restore your previous shell
+environment.
 
 See "Directories and Options" below for more information on the directory
 structure and how to change it.
