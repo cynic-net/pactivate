@@ -1,4 +1,4 @@
-#   pae version 0.5.0   https://github.com/cynic-net/pactivate
+#   pae version 0.5.1   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -14,6 +14,8 @@
     || { echo 1>&2 "source (.) pae with Bash."; exit 9; }
 
 
+#   You can change this in your environment if you want to download
+#   pactivate from a different source.
 __pae_pactivate_url=https://raw.githubusercontent.com/cynic-net/pactivate/main/pactivate
 
 __pae_usage() {
@@ -26,6 +28,7 @@ Usage:
     pae -c NAME             # create a virtual env
     pae --rm NAME           # remove a virtual env created by pae
                             #   (this will not remove non-pae files)
+    pae -U                  # update the pactivate used by this function
 
 All commands also accept the following options:
     -v          Verbose mode; otherwise we try to run as quietly as possible.
@@ -43,6 +46,26 @@ or name given. However, for backward compatibility with virtualenvwrapper
 it will also activate and deactivate any name/directory that directly
 contains a virtual environment built with virtualenv.
 _____
+}
+
+__pae_update_pactivate() {
+    #   Should this be quieter unless -v is given?
+    local target_dir="$1"
+
+    echo "----- Downloading pactivate"
+    echo -n 'Current version: '
+    sed -n -e 2>/dev/null \
+            '/^#   pactivate /s/ *https:.*//p' "$target_dir"/pactivate \
+        || echo '(none)'
+
+    curl --fail --show-error '-#' ${quiet:+--silent} \
+        --create-dirs --output "$target_dir"/pactivate \
+        "$__pae_pactivate_url" \
+    || { echo 1>&2 "pae: can't download pactivate"; return 22; }
+
+    echo -n 'Updated version: '
+    sed -n -e '/^#   pactivate /s/ *https:.*//p' "$target_dir"/pactivate \
+        || echo '(none)'
 }
 
 pae() {
@@ -68,6 +91,7 @@ pae() {
                 ;;
         -r)     shift; action=run;;
         --rm)   shift; action=remove;;
+        -U)     __pae_update_pactivate "$pae_home"; return 0;;
         -v)     shift; quiet='';;
         -*)     echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
                 ;;
@@ -140,13 +164,7 @@ pae() {
                 echo 1>&2 "pae: virtual environment already exists in $vedir"
                 return 3
             }
-            [[ -r "$pae_home/pactivate" ]] || {
-                echo "Downloading pactivate..."
-                curl --fail --show-error '-#' ${quiet:+--silent} \
-                    --create-dirs --output "$pae_home/pactivate" \
-                    "$__pae_pactivate_url" \
-                || { echo 1>&2 "pae: can't download pactivate"; return 22; }
-            }
+            [[ -r "$pae_home/pactivate" ]] || __pae_update_pactivate "$pae_home"
             mkdir -p "$vedir"
             cat >"$vedir/README" <<_____
 .build/virtualenv/ is a pactivate environment created by pae.
