@@ -9,4 +9,4 @@ RUN apt-get -qq update && apt-get install -y -qq \
 ENV PIP_ROOT_USER_ACTION=ignore
 
 ADD bashrc /root/.bashrc
-ADD pactivate cont-test /test/
+ADD pactivate tscript/cont-test /test/
