@@ -1,4 +1,4 @@
-#   pae version 0.4.1   https://github.com/cynic-net/pactivate
+#   pae version 0.4.2   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -71,9 +71,8 @@ pae() {
         *)  break;;
     esac; done
     if [[ ${#@} -eq 0 ]]; then
-        if [[ $action != deactivate && $action != run ]]; then
-            echo 1>&2 "pae: missing parameter (-h for help)"; return 2
-        fi
+        [[ $action == deactivate ]] || {
+            echo 1>&2 "pae: missing parameter (-h for help)"; return 2; }
     elif [[ ${#@} -ne 1 && $action != run ]]; then
         echo 1>&2 "pae: too many parameters:" "$@"; return 2
     else
