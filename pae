@@ -1,4 +1,4 @@
-#   pae version 0.4.3   https://github.com/cynic-net/pactivate
+#   pae version 0.5.0   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -24,6 +24,8 @@ Usage:
     pae -d                  # deactivate the current virtual env
     pae -l                  # list virtual env dirs in virtual env home
     pae -c NAME             # create a virtual env
+    pae --rm NAME           # remove a virtual env created by pae
+                            #   (this will not remove non-pae files)
 
 All commands also accept the following options:
     -v          Verbose mode; otherwise we try to run as quietly as possible.
@@ -65,6 +67,7 @@ pae() {
                 return 0
                 ;;
         -r)     shift; action=run;;
+        --rm)   shift; action=remove;;
         -v)     shift; quiet='';;
         -*)     echo 1>&2 "pae: bad option: $1 (-h for help)"; return 2
                 ;;
@@ -151,6 +154,36 @@ For more information, see https://github.com/cynic-net/pactivate
 _____
             . "$pae_home/pactivate" $quiet -B "$vedir"
             ;;
+        remove)
+            #   NOTE: This works only with pae-fromat environments; it's not
+            #   worth trying to support this for virtualenvwrapper environments.
+            if ! [[ -e $vedir/.build/virtualenv/bin/activate ]]; then
+                echo 1>&2 "pae:" \
+                    "$vedir does not appear to have a pae virtual env"
+                return 1
+            fi
+            #   Remove README only if it appears to be one created by pae.
+            if [[ 0 -eq $(grep -s -c -E -v \
+                          'is a pactivate environment created by pae|For more information, see https://github.com/cynic-net/pactivate' \
+                          "$vedir"/README
+            ) ]]; then
+                rm -f "$vedir"/README
+            fi
+            #   Remove the virtualenv and its bootstrap.
+            rm -rf "$vedir"/.build/{bootstrap/pactivate,virtualenv}
+            #   Attempt to remove remaining directories; fail quietly
+            #   if they're not empty as we handle that later.
+            rmdir >/dev/null 2>&1 "$vedir"/.build/bootstrap "$vedir"/.build \
+                || true
+            rmdir "$vedir" || {
+                echo 1>&2 'Warning: non-pae files not removed.'
+                return 0
+            }
+            ;;
+        *)
+            echo 1>&2 "pae: internal error: bad action '$action'."
+            return 9
+            ;;
     esac
 }
 
@@ -202,7 +235,7 @@ __pae_complete() {
 
     if [[ $cstate -eq 0 && $word =~ ^- ]]; then
         #   pae option.
-        mapfile -t COMPREPLY < <(compgen -W "-r -a -d -c -v" -- "$word")
+        mapfile -t COMPREPLY < <(compgen -W "-r -a -d -l -c --rm -v" -- "$word")
     elif [[ $cstate -eq 0 ]]; then
         #   Virtual env name or path
         COMPREPLY=()
