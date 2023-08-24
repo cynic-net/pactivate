@@ -14,7 +14,7 @@
     || { echo 1>&2 "source (.) pae with Bash."; exit 9; }
 
 
-__pae_url=https://raw.githubusercontent.com/cynic-net/pactivate/main/pactivate
+__pae_pactivate_url=https://raw.githubusercontent.com/cynic-net/pactivate/main/pactivate
 
 __pae_usage() {
     cat <<_____
@@ -141,7 +141,7 @@ pae() {
                 echo "Downloading pactivate..."
                 curl --fail --show-error ${__pa_quiet:+--silent} \
                     --create-dirs --output "$pae_home/pactivate" \
-                    "$__pae_url" \
+                    "$__pae_pactivate_url" \
                 || { echo 1>&2 "pae: can't download pactivate"; return 22; }
             }
             mkdir -p "$vedir"
