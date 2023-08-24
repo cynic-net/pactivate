@@ -1,29 +1,28 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
+output=
+TEST_PASSED=false
+trap '  ec=$?
+        $TEST_PASSED || echo "FAILURE: unexpected exit; code=$ec"
+' 0
+
+####################################################################
+
 export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
-
-sudo=sudo; [[ -e $PROJDIR/.no-sudo ]] && sudo=
-winpty=; msys_prefix=
-[[ "${MSYSTEM:-}" =~ (MSYS|MINGW).* ]] && \
-    { sudo=; winpty=winpty; msys_prefix=/; }
-
-IMG=pactivate:deb11     # name of the image we build for testing
-TEST_INTERACT=false     # `true` if we start an interactive shell in the
-                        #   container after running the tests
-TEST_QUIET=             # -q if we are running tests as quietly as possible
-
-while [[ $# -gt 0 ]]; do case "$1" in
-    -i)     shift; TEST_INTERACT=true;;
-    -q)     shift; TEST_QUIET=-q;;
-    *)      echo 1>&2 "$0: Unknown argument: $1"; exit 2;;
-esac; done
-
 cd "$PROJDIR"
-[[ -n $sudo ]] && $sudo -v -p '[sudo] password for %p (to run docker): '
 
-echo "Building container (this may take a few moments)...."
-$sudo docker build $TEST_QUIET -t "$IMG" .
-$sudo $winpty docker run --rm -it \
-    -e "TEST_INTERACT=$TEST_INTERACT" -e "TEST_QUIET=$TEST_QUIET" \
-    "$IMG" $msys_prefix/test/cont-test
+header() {
+    echo '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+    echo '┃' "$@"
+}
+
+header tscript/pactivate-test-docker
+./tscript/pactivate-test-docker "$@"
+
+header tscript/pae-test
+./tscript/pae-test "$@"
+
+header "All tests passed"
+    echo '┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+TEST_PASSED=true

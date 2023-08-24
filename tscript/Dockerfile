@@ -8,5 +8,5 @@ RUN apt-get -qq update && apt-get install -y -qq \
 #   since it's not a bad idea inside a Docker container.
 ENV PIP_ROOT_USER_ACTION=ignore
 
-ADD bashrc /root/.bashrc
+ADD tscript/bashrc /root/.bashrc
 ADD pactivate tscript/cont-test /test/
