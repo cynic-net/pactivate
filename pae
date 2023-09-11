@@ -38,7 +38,7 @@ All commands also accept the following options:
 Virtual environments are normally stored in the "virtual environment home,"
 which is specified by the PAE_HOME environment variable. If that is not set
 it falls back to WORKON_HOME for virtualenvwrapper compatibility, and
-then ~/.pyvirtenv. Howwever specifying a NAME parameter with a slash in it
+then ~/.pyvirtenv. However specifying a NAME parameter with a slash in it
 will instead use the exact path specified. (Use ./NAME to use a directory
 under the current working directory.)
 
