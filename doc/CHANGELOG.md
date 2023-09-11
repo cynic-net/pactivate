@@ -13,7 +13,10 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 #### -current
-- New `doc/` subdir; initial version of `doc/pae.md`.
+
+### pae 0.5.3 (2023-09-11)
+- Changed: Now `pae .` is treated like `pae ./`.
+- Added: New `doc/` subdir; initial version of `doc/pae.md`.
 
 ### pactivate 0.3.5, pae 0.5.2 (2023-09-11)
 - `pae` added.

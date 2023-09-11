@@ -1,4 +1,4 @@
-#   pae version 0.5.2   https://github.com/cynic-net/pactivate
+#   pae version 0.5.3   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -106,14 +106,17 @@ pae() {
     elif [[ ${#@} -ne 1 && $action != run ]]; then
         echo 1>&2 "pae: too many parameters:" "$@"; return 2
     else
-        vedir="$1"                      # assume directory...
-        [[ $1 == ${1##*/} ]] && {       # ...unless no slash in arg
-            [[ $1 == . || $1 == .. ]] && {
+        if [[ $1 != ${1##*/} ]]; then   # If there's a slash in the name,
+            vedir="$1"                  #   we've been given a path.
+        elif [[ $1 == . ]]; then        # Or if it's just `.`,
+            vedir=./                    #   it's also a path.
+        else                            # Otherwise it's a name.
+            [[ $1 == .* || $1 == .. ]] && {
                 echo 1>&2 "pae: bad virtualenv name: $1"
                 return 2
             }
             vedir="$pae_home/$1"
-        }
+        fi
         shift                           # remove last param
     fi
 
