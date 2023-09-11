@@ -109,7 +109,7 @@ pae() {
         vedir="$1"                      # assume directory...
         [[ $1 == ${1##*/} ]] && {       # ...unless no slash in arg
             [[ $1 == . || $1 == .. ]] && {
-                echo 1>&2 "pae: bad virtalenv name: $1"
+                echo 1>&2 "pae: bad virtualenv name: $1"
                 return 2
             }
             vedir="$pae_home/$1"
