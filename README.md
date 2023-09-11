@@ -9,8 +9,8 @@ touch the user or system Python environment. It works with any version of
 Python supported by [`get-pip.py`], i.e., 2.7 onward.
 
 A `pae` shell function that provides functionality similar to
-`virtualenvwrapper` is also provided. See the [`pae`](./pae) file for
-details.
+[virtualenvwrapper] is also provided. See the [documentation][pae] and the
+[`pae`](./pae) file for details.
 
 This documentation assumes you already have a general understanding of
 [virtualenv] virtual environments and know how to use the [`activate`]
@@ -266,6 +266,8 @@ contents of this file are ignored.)
 [`pythonz`]: https://github.com/saghul/pythonz
 [`venv`]: https://docs.python.org/3/library/venv.html
 [docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
+[pae]: ./doc/pae.md
 [req]: https://pip.pypa.io/en/stable/reference/requirements-file-format/
 [source]: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-_002e
 [virtualenv]: https://virtualenv.pypa.io/
+[virtualenvwrapper]: https://pypi.org/project/virtualenvwrapper/
