@@ -1,6 +1,14 @@
 To Do
 =====
 
+### Bugs and Infelicities
+
+- If the path given to `pae` has a `pactivate` in it, that should be used
+  instead of the default `pactivate` that `pae` downloads. (This ensures
+  that it functions the same way as the build system presumably using that
+  `pactivate`, and allows testing with older and newer versions of
+  `pactivate`.)
+
 ### Features
 
 - On Windows (MinGW) the default Python interpreter (when there is no
