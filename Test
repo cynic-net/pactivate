@@ -18,7 +18,7 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     -*)     optargs+=("$1"); shift;;
     *)      break;;
 esac; done
-#   Here "$@" is set to the remaining non-option args; we don't use this yet.
+[[ ${#@} -eq 0 ]] && set debian:11 ubuntu:22.04     # default images to test
 
 export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
 cd "$PROJDIR"
@@ -28,10 +28,10 @@ header() {
     echo '┃' "$@"
 }
 
-$pactivate_test && {
+$pactivate_test && for img in "$@"; do
     header tscript/pactivate-test-docker
-    ./tscript/pactivate-test-docker "${optargs[@]}"
-}
+    ./tscript/pactivate-test-docker "${optargs[@]}" "$1"
+done
 
 $pae_test && {
     header tscript/pae-test
