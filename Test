@@ -9,6 +9,17 @@ trap '  ec=$?
 
 ####################################################################
 
+optargs=()
+pactivate_test=true
+pae_test=true
+while [[ ${#@} -gt 0 ]]; do case "$1" in
+    -e)     shift; pactivate_test=false;;
+    -E)     shift; pae_test=false;;
+    -*)     optargs+=("$1"); shift;;
+    *)      break;;
+esac; done
+#   Here "$@" is set to the remaining non-option args; we don't use this yet.
+
 export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
 cd "$PROJDIR"
 
@@ -17,11 +28,15 @@ header() {
     echo '┃' "$@"
 }
 
-header tscript/pactivate-test-docker
-./tscript/pactivate-test-docker "$@"
+$pactivate_test && {
+    header tscript/pactivate-test-docker
+    ./tscript/pactivate-test-docker "${optargs[@]}"
+}
 
-header tscript/pae-test
-./tscript/pae-test "$@"
+$pae_test && {
+    header tscript/pae-test
+    ./tscript/pae-test "${optargs[@]}"
+}
 
 header "All tests passed"
     echo '┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
