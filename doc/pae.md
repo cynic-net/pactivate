@@ -8,8 +8,8 @@ executes commands in Python virtual environments created by [`pactivate`].
 ### Installation
 
 No files need be installed beyond making `pae` accessible somewhere. To
-enable the function, source the `pae` file, with `source ./pae` or `.
-./pae` (replacing `.` with the path to wherever it happens to live on your
+enable the function, source the `pae` file, with `source ./pae` or `. ./pae`
+(replacing `./pae` with the path to wherever it happens to live on your
 system). This is usually added to your `~/.bashrc`.
 
 It's not necessary to have `pactivate` anywhere on your system; the first
