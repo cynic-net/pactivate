@@ -149,6 +149,19 @@ XXX write me
 XXX write me
 
 
+Pactivate Versions
+------------------
+
+`pae` uses `$PAE_HOME/pactivate` to create and activate virtual
+environments. If not present, the latest version is downloaded from
+github.com. You can update that version with `pae -U`:
+
+    c$ pae -U
+    ----- Downloading pactivate
+    Current version: #   pactivate version 0.3.5
+    Updated version: #   pactivate version 0.3.5
+
+
 
 <!-------------------------------------------------------------------->
 [virtualenvwrapper]: https://pypi.org/project/virtualenvwrapper/
