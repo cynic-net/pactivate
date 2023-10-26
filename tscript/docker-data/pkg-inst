@@ -2,6 +2,10 @@
 #   Not all images have bash available
 set -eu     # no -o pipefail in POSIX
 
+alpine() {
+    apk add bash curl
+}
+
 debian() {  # Debian/Ubuntu package install
     apt-get -qq update
     apt-get install -y -qq \
@@ -11,4 +15,7 @@ debian() {  # Debian/Ubuntu package install
 }
 
 echo '─────' "$0" "$@"
-debian
+case "$1" in    # $DISTRO
+    python:*-alpine)                alpine;;
+    debian:*|ubuntu:*)              debian;;
+esac
