@@ -19,6 +19,7 @@ export PROJDIR=$(cd "$(dirname "$0")/.." && pwd -P)
 
 TEST_QUIET=             # -q if we are running tests as quietly as possible
 while [[ $# -gt 0 ]]; do case "$1" in
+    -i)     shift;; # no interactive mode needed
     -q)     shift; TEST_QUIET=-q;;
     *)      echo 1>&2 "$0: Unknown argument: $1"; exit 2;;
 esac; done
