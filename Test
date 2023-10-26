@@ -30,12 +30,12 @@ header() {
 }
 
 $pactivate_test && for img in "$@"; do
-    header tscript/pactivate-test-docker
-    ./tscript/pactivate-test-docker "${optargs[@]}" "$1"
+    header tscript/pactivate-test-docker "${optargs[@]}" "$img"
+    ./tscript/pactivate-test-docker "${optargs[@]}" "$img"
 done
 
 $pae_test && {
-    header tscript/pae-test
+    header tscript/pae-test "${optargs[@]}"
     ./tscript/pae-test "${optargs[@]}"
 }
 
