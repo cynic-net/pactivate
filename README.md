@@ -210,21 +210,36 @@ works and some of the constraints it must deal with.
 Developer Notes
 ---------------
 
-The tests are run with the `Test` script which sets up a Docker image and
-runs the tests in a container. You may be prompted for your sudo password
-to run Docker; if you don't want to use `sudo` you can create a `.no-sudo`
-file in the same directory. See below for more information on this.
+The test scripts are under `tscript/`; these can be run individually or all
+run in sequence for a default set of test images using the top-level `Test`
+script. The test scripts are summarised below.
 
-Options to `Test` must appear before any base image names. They are:
+Some tests are run in a Docker container to ensure that `pactivate` does
+not accidentally use an existing installation of `pip` or `virtualenv`. For
+these you may be prompted for your sudo password in order to run Docker as
+root. If you don't want to use `sudo` you can create a `.no-sudo` file in
+base directory of the project (repo). See below for more information on
+this.
+
+### Test Scripts
+
+* `tscript/pactivate-test-docker` uses data files under `tscript/docker-data/`
+  to set up a Docker image and run the `pactivate` tests within a container.
+  It requires a single argument giving the name of the image on which to
+  base the test image, e.g., `debian:11`.
+  options.
+
+* `tscript/pae-test` tests the `pae` program; this does not require Docker.
+
+All test scripts also have the following optional arguments, that must
+appear before any required arguments. Inapplicable optional arguments for a
+particular test script (e.g., `-i` for `pae-test`) are ignored.
 - `-q`: Quiet mode. Produces significantly less output, but can make
   identifying problems more difficult.
 - `-i`: Interactive mode. When the tests exit (whether via successful
   completion or a failure) a shell is started in the test container. This
   allows for interactive investigation of problems or simply playing with
   the script.
-
-The tests are run in a Docker container to ensure that `pactivate` does not
-accidentally use an existing installation of `pip` or `virtualenv`.
 
 ### Implementation Notes and Gotchas
 
