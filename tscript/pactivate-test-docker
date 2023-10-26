@@ -28,7 +28,7 @@ cd "$PROJDIR"
 [[ -n $sudo ]] && $sudo -v -p '[sudo] password for %p (to run docker): '
 
 echo "From $DISTRO building $IMG (this may take a few moments)...."
-$sudo docker build -f tscript/Dockerfile \
+$sudo docker build -f tscript/docker-data/Dockerfile \
     --build-arg=DISTRO="$DISTRO" \
     $TEST_QUIET -t "$IMG" .
 $sudo $winpty docker run --rm -it \
