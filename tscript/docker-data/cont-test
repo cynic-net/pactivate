@@ -21,8 +21,10 @@ fail() { echo FAILURE: "$@"; TEST_PASSED=true; exit 1; }
 ####################################################################
 #   Definitions and Functions
 
+DISTRO=$(cat /DISTRO)
+
 echo -n '━━━━━ TESTS START with '
-echo    "TEST_QUIET='$TEST_QUIET' TEST_INTERACT='$TEST_INTERACT'"
+echo "DISTRO='$DISTRO' TEST_QUIET='$TEST_QUIET' TEST_INTERACT='$TEST_INTERACT'"
 pactivate="./pactivate ${TEST_QUIET:+-q}"
 build=/test/.build
 virtualenv=$build/virtualenv
