@@ -30,6 +30,11 @@ build=/test/.build
 virtualenv=$build/virtualenv
 bsve=$build/bootstrap/pactivate
 
+case "$DISTRO" in
+    debian:*|ubuntu:*)      debian_tests=true;;
+    *)                      debian_tests=false;;
+esac
+
 clean_virtualenv() { rm -rf "$virtualenv"; }
 
 ####################################################################
@@ -52,20 +57,24 @@ echo '━━━━━ unknown argument error'
 [[ 'pactivate: unknown argument: xyz' == $(cat err-args) ]] \
     || { cat err-args; fail "bad message"; }
 
-echo '━━━━━ run pactivate without distutils'
-if (. $pactivate -q 2>err-distutils); then
-    fail "expected error without python3-distutils"
+if ! $debian_tests; then
+    echo '━━━━━ (Debian distutils tests skipped)'
 else
-    msg="Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
-    [[ $(cat err-distutils) == *$msg ]] \
-        || { cat err-distutils; fail "bad message"; }
-fi
+    echo '━━━━━ run pactivate without distutils'
+    if (. $pactivate -q 2>err-distutils); then
+        fail "expected error without python3-distutils"
+    else
+        msg="Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
+        [[ $(cat err-distutils) == *$msg ]] \
+            || { cat err-distutils; fail "bad message"; }
+    fi
 
-echo '━━━━━ installing distutils'
-apt-get -qq -y install python3-distutils >log-inst-distutils 2>&1 || {
-    cat log-inst-distutils
-    fail "apt-get install python3-distutils failed"
-}
+    echo '━━━━━ installing distutils'
+    apt-get -qq -y install python3-distutils >log-inst-distutils 2>&1 || {
+        cat log-inst-distutils
+        fail "apt-get install python3-distutils failed"
+    }
+fi
 
 echo '━━━━━ run pactivate clean'
 #   This does the full bootstrap and virtualenv creation
@@ -85,7 +94,10 @@ clean_virtualenv
 #   We use a relative symlink here to ensure that pactivate finds the absolute
 #   path to it, rather than re-using the relative path at a different
 #   directory level and thus having the link point to the wrong place.
-ln -s ../usr/bin/python3 .python
+    ls -l .python ../$(type -p python3) || true # XXX
+echo ln -s ../$(type python3) .python
+ln -s ../$(type -p python3) .python
+    ls -l .python || true # XXX
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 echo '───── removing .python symlink'
 #   A virtualenv created with the .python symlink should still work even
@@ -95,37 +107,50 @@ echo '───── removing .python symlink'
 rm .python
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 
-echo '━━━━━ run pactivate with Python 2 and requirements.txt'
-#   Alternate base dir configured for different Python interpreter.
-altbase=/test/altbase; mkdir -p $altbase
-ln -s /usr/bin/python2 $altbase/.python
+echo '━━━━━ pactivate with -[Bb] and requirements.txt'
+echo '───── building altbase'
+altbase=/test/test-requirements; mkdir -p $altbase
 echo 'pyyaml>=5' > $altbase/requirements.txt
-#   We re-use the existing build dir because we're testing download of a
-#   non-modern (2.7) Python bootstrap, so the bootstrap dir will be
-#   different; we need remove only the virtualenv.
-clean_virtualenv
-#   Rebuild and check
 echo '───── running build'
-(cd /tmp && . /test/$pactivate -B $altbase -b $build) \
+(cd /tmp && . /test/$pactivate -B $altbase -b $altbase/build) \
     || fail "build failure"
-[[ -d ${bsve}2.7 ]] || {
-    ls -la $build/bootstrap/;
-    fail "versioned bootstrap dir not found"; }
-echo '───── testing activation and Python version'
-(. /test/$pactivate -B $altbase -b $build \
-    && v=$(python -c \
-      'from platform import *; print("{}.{}".format(*python_version_tuple()))')\
-    && echo "Testing version: $v" \
-    && [[ $v == 2.7 ]]) || fail "wrong Python version: expected 2.7"
 echo '───── testing yaml import'
-$build/virtualenv/bin/python -c 'import yaml' \
+$altbase/build/virtualenv/bin/python -c 'import yaml' \
     || fail "yaml import failure; requirements.txt broken?"
 
-echo '───── checking .python difference warning'
-#   This should print a warning message about the interpreter being different.
-#   This won't fail if the warning isn't printed, but you can at least
-#   manually confirm that it's there.
-(. $pactivate -q && pip --version) || fail "pip --version didn't work"
+if $debian_tests; then
+    echo '━━━━━ run pactivate with Python 2 and requirements.txt'
+    #   Alternate base dir configured for different Python interpreter.
+    altbase=/test/altbase; mkdir -p $altbase
+    ln -s /usr/bin/python2 $altbase/.python
+    echo 'pyyaml>=5' > $altbase/requirements.txt
+    #   We re-use the existing build dir because we're testing download of a
+    #   non-modern (2.7) Python bootstrap, so the bootstrap dir will be
+    #   different; we need remove only the virtualenv.
+    clean_virtualenv
+    #   Rebuild and check
+    echo '───── running build'
+    (cd /tmp && . /test/$pactivate -B $altbase -b $build) \
+        || fail "build failure"
+    [[ -d ${bsve}2.7 ]] || {
+        ls -la $build/bootstrap/;
+        fail "versioned bootstrap dir not found"; }
+    echo '───── testing activation and Python version'
+    (. /test/$pactivate -B $altbase -b $build \
+        && v=$(python -c \
+          'from platform import *; print("{}.{}".format(*python_version_tuple()))')\
+        && echo "Testing version: $v" \
+        && [[ $v == 2.7 ]]) || fail "wrong Python version: expected 2.7"
+    echo '───── testing yaml import'
+    $build/virtualenv/bin/python -c 'import yaml' \
+        || fail "yaml import failure; requirements.txt broken?"
+
+    echo '───── checking .python difference warning'
+    #   This should print a warning message about the interpreter being
+    #   different. This won't fail if the warning isn't printed, but you
+    #   can at least manually confirm that it's there.
+    (. $pactivate -q && pip --version) || fail "pip --version didn't work"
+fi
 
 echo '━━━━━ TESTS COMPLETE'
 TEST_PASSED=true
