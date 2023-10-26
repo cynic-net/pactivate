@@ -9,19 +9,20 @@ trap '  ec=$?
 
 ####################################################################
 
+export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
+cd "$PROJDIR"
+
 optargs=()
 pactivate_test=true
 pae_test=true
 while [[ ${#@} -gt 0 ]]; do case "$1" in
+    -C)     shift; rm -rf ".build/";;
     -e)     shift; pactivate_test=false;;
     -E)     shift; pae_test=false;;
     -*)     optargs+=("$1"); shift;;
     *)      break;;
 esac; done
 [[ ${#@} -eq 0 ]] && set debian:11 ubuntu:22.04     # default images to test
-
-export PROJDIR=$(cd "$(dirname "$0")" && pwd -P)
-cd "$PROJDIR"
 
 header() {
     echo '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
