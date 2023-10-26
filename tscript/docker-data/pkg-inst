@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+#   Not all images have bash available
+set -eu     # no -o pipefail in POSIX
+
+debian() {  # Debian/Ubuntu package install
+    apt-get -qq update
+    apt-get install -y -qq \
+        curl python3 python2 \
+        vim-tiny                                    # for debugging
+    #   Note no python3-distutils here! We test error message when not present.
+}
+
+echo '─────' "$0" "$@"
+debian

@@ -7,10 +7,10 @@ ARG DISTRO                      # previous ARGs wiped out by FROM
 #   override when running the container.
 RUN echo $DISTRO >/DISTRO
 
-RUN apt-get -qq update && apt-get install -y -qq \
-    curl python3 python2 \
-    vim-tiny                                    # for debugging
-    #   Note no python3-distutils here! We test error message when not present.
+#   Through this section we have the minimal setup for the package installs to
+#   avoid regenerating this more often that we need to (it can take some time).
+ADD tscript/docker-data/pkg-inst /test/
+RUN /test/pkg-inst "$DISTRO"
 
 #   Suppress messages from Pip about how running as root is a bad idea,
 #   since it's not a bad idea inside a Docker container.
