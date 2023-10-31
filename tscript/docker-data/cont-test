@@ -88,6 +88,22 @@ echo '━━━━━ run pactivate installed'
 #   It also tests the -q option so we can leave it out (by default)
 #   for easier debugging in the more complex "with options" test below.
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
+echo '───── checking .python difference warning'
+#   This should print a warning message about the interpreter being different.
+#   This won't fail if the warning isn't printed, but you can at least manually
+#   confirm that it's there.
+#      Our "alternate" python binary is just the standard one with a newline
+#   appended to make it "different" from the standard one but still runnable.
+(cat $(type -p python3); echo) > /tmp/bin-python; chmod +x /tmp/bin-python
+ln -s /tmp/bin-python .python
+(. $pactivate -q 2>err-diffwarn && pip --version) \
+    || fail "pip --version didn't work"
+echo 'Warning message was:'; cat err-diffwarn
+[[ $(cat err-diffwarn) =~ 'WARNING: virtualenv/bin/python (' ]] \
+    || fail "line above is bad message"
+[[ $(cat err-diffwarn) =~ ') is not /test/.python (' ]] \
+    || fail "line above is bad message"
+rm -f .python
 
 echo '━━━━━ re-install virtualenv with .python symlink'
 clean_virtualenv
@@ -144,12 +160,6 @@ if $debian_tests; then
     echo '───── testing yaml import'
     $build/virtualenv/bin/python -c 'import yaml' \
         || fail "yaml import failure; requirements.txt broken?"
-
-    echo '───── checking .python difference warning'
-    #   This should print a warning message about the interpreter being
-    #   different. This won't fail if the warning isn't printed, but you
-    #   can at least manually confirm that it's there.
-    (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 fi
 
 echo '━━━━━ TESTS COMPLETE'
