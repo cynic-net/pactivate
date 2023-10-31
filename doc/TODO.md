@@ -3,11 +3,6 @@ To Do
 
 ### Bugs and Infelicities
 
-- On the second run after an initial `pactivate` bootstrap, the
-  `----- Installing bootstrap pip (ver=latest)` part is run a second time,
-  though it's not necessary. This is harmless, but an annoying waste of
-  time.
-
 - On Python 3.11, during `Installing bootstrap pip` we see a warning,
   `DeprecationWarning: The distutils package is deprecated and slated for
   removal in Python 3.12.` This appears to be due to our `"$__pa_python" -c

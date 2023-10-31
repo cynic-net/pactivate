@@ -1,4 +1,4 @@
-#   pactivate version 0.3.5   https://github.com/cynic-net/pactivate
+#   pactivate version 0.3.6   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -75,9 +75,11 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
 [[ -d $__pa_bootdir/virtualenv/ ]] || {
     echo '----- Installing bootstrap virtualenv'
     #   This install produces spurious "bootstrap/.../bin already exists"
-    #   messages; --upgrade suppresses these.
+    #   messages; --upgrade suppresses these. However, --upgrade also seems
+    #   to entirely remove the bin/ directory, so we "re-install" pip
+    #   (which will not re-download it) to restore bin/pip as well.
     PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" \
-        $__pa_quiet install --upgrade -t "$__pa_bootdir" virtualenv
+        $__pa_quiet install --upgrade -t "$__pa_bootdir" pip virtualenv
 }
 
 [[ -d $__pa_builddir/virtualenv/ ]] || {

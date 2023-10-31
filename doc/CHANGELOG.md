@@ -14,6 +14,13 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 
+### pactivate 0.3.6 (2023-10-31)
+- Fixed: remove spurious re-install of boostrap pip on first run after
+  bootstrapping.
+- Test framework: Now works with Docker's "official" Python Alpine images
+  and probably (with a few more tweaks) other Linux distributions. Various
+  other fixes and improvements as well.
+
 ### pae 0.5.3 (2023-09-11)
 - Changed: Now `pae .` is treated like `pae ./`.
 - Added: New `doc/` subdir; initial version of `doc/pae.md`.
