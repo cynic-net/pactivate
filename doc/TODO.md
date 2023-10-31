@@ -3,6 +3,11 @@ To Do
 
 ### Bugs and Infelicities
 
+- On the second run after an initial `pactivate` bootstrap, the
+  `----- Installing bootstrap pip (ver=latest)` part is run a second time,
+  though it's not necessary. This is harmless, but an annoying waste of
+  time.
+
 - On Python 3.11, during `Installing bootstrap pip` we see a warning,
   `DeprecationWarning: The distutils package is deprecated and slated for
   removal in Python 3.12.` This appears to be due to our `"$__pa_python" -c
@@ -21,6 +26,13 @@ To Do
 
 - On Windows (MinGW) the default Python interpreter (when there is no
   `$BASE/.python` link) should be `py`, not `python3`.
+
+- This should be made to work on systems with only an interpreter named
+  `python` (i.e., without an interpreter named `python3`), such as
+  `python:2.7-alpine`. (The tests also assume that the interpreter being
+  used is named `python3` and the bootstrap dir is named
+  `$build/bootstrap/pactivate/`, which breaks when the bootstrap dir ends
+  up being named `$build/bootstrap/pactivate2.7/`.)
 
 ### Consider
 
