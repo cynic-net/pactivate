@@ -1,0 +1,4 @@
+#   When you use `./Test -i`, this .bash_profile is is run when the container
+#   goes into interactive mode.
+
+. ~/.bashrc

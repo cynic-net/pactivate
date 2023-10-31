@@ -1,5 +1,4 @@
-#   When you use `./Test -i`, this .bashrc is is run when the container
-#   goes into interactive mode.
+#   When you use `./Test -i`, this .bashrc is sourced by .bash_profile.
 
 set -o vi
 

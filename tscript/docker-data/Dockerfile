@@ -17,4 +17,5 @@ RUN /test/pkg-inst "$DISTRO"
 ENV PIP_ROOT_USER_ACTION=ignore
 
 ADD tscript/docker-data/bashrc /root/.bashrc
+ADD tscript/docker-data/bash_profile /root/.bash_profile
 ADD pactivate tscript/docker-data/cont-test /test/
