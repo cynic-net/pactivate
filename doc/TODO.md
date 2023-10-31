@@ -3,7 +3,7 @@ To Do
 
 ### Bugs and Infelicities
 
-- On Python 3.1.12, during `Installing bootstrap pip` we see a warning,
+- On Python 3.11, during `Installing bootstrap pip` we see a warning,
   `DeprecationWarning: The distutils package is deprecated and slated for
   removal in Python 3.12.` This appears to be due to our `"$__pa_python" -c
   'import distutils.cmd' || ...` used to generate a nice error message if
