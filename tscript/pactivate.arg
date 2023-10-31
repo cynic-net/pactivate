@@ -1,7 +1,7 @@
-#   Latest and earliest "standard" releases, and common distro releases.
+#   Latest and earliest "standard" releases, 2.7, and common distro releases.
 python:3.12-alpine
 python:3.7-alpine
-#python:2.7-alpine      # "python3: command not found"
+python:2.7-alpine
 debian:11
 ubuntu:22.04
 
@@ -12,7 +12,7 @@ python:3.10-alpine
 python:3.9-alpine
 python:3.8-alpine
 
-#   Obsolete releases for which we have special behaviour.
+#   Obsolete releases for which we have special behaviour (excepting 2.7).
 python:3.6-alpine
 python:3.5-alpine
 python:3.4-alpine

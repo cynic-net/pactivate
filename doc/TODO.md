@@ -20,14 +20,8 @@ To Do
 ### Features
 
 - On Windows (MinGW) the default Python interpreter (when there is no
-  `$BASE/.python` link) should be `py`, not `python3`.
-
-- This should be made to work on systems with only an interpreter named
-  `python` (i.e., without an interpreter named `python3`), such as
-  `python:2.7-alpine`. (The tests also assume that the interpreter being
-  used is named `python3` and the bootstrap dir is named
-  `$build/bootstrap/pactivate/`, which breaks when the bootstrap dir ends
-  up being named `$build/bootstrap/pactivate2.7/`.)
+  `$BASE/.python` link) should be `py`, not `python3`. (This may already
+  be working, but we have no test for it.)
 
 ### Consider
 

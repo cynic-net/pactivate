@@ -14,6 +14,11 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 
+### pactivate 0.4.0 (2023-10-31)
+- Added: If `python3` is not available, we try `python` as well. (Under
+  Windows/MINGW it will first try `py` before these two, but this is
+  untested.)
+
 ### pactivate 0.3.6 (2023-10-31)
 - Fixed: remove spurious re-install of boostrap pip on first run after
   bootstrapping.

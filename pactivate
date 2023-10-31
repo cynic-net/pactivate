@@ -1,4 +1,4 @@
-#   pactivate version 0.3.6   https://github.com/cynic-net/pactivate
+#   pactivate version 0.4.0   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -22,10 +22,17 @@ while [[ $# -gt 0 ]]; do case "$1" in
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 
-__pa_python=python3     # XXX should default to `py` for Windows
-#   Even if it's a dangling link (-e fails) we use it so that user sees error.
-[[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]] \
-    && __pa_python=$__pa_basedir/.python
+if [[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]]; then
+    #   Even if it's a dangling link (-e fails) we use it so that the
+    #   user sees the error.
+    __pa_python=$__pa_basedir/.python
+else
+    #   We test `py` only in Windows/MINGW because the Unix `py` program
+    #   (from the pythonpy package) is a different thing we never want to use.
+    for __pa_python in ${MSYSTEM:+py} python3 python PYTHON_NOT_FOUND; do
+        "$__pa_python" --version >/dev/null 2>&1 && break
+    done
+fi
 "$__pa_python" --version >/dev/null 2>&1 || {
     [[ -L $__pa_python ]] \
         && echo "$__pa_python -> $(readlink "$__pa_python")"

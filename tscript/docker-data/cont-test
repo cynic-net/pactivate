@@ -42,6 +42,14 @@ clean_virtualenv() { rm -rf "$virtualenv"; }
 
 cd /test/
 
+echo '━━━━━ find Python interpreter name'
+#   Figure out which Python interpeter binary we're doing in the same way
+#   as pactivate itself does. (This code is directly copied.)
+for pa_python in ${MSYSTEM:+py} python3 python PYTHON_NOT_FOUND; do
+    "$pa_python" --version >/dev/null 2>&1 && break
+done
+echo "Using $pa_python found at $(type -p $pa_python): $($pa_python --version)"
+
 echo '━━━━━ error when run with /bin/sh'
 /bin/sh   $pactivate 2>err-sh   && fail "didn't fail when run with /bin/sh"
 [[ 'source (.) this with Bash.' == "$(cat err-sh)" ]] \
@@ -105,7 +113,7 @@ echo '───── checking .python difference warning'
 #   confirm that it's there.
 #      Our "alternate" python binary is just the standard one with a newline
 #   appended to make it "different" from the standard one but still runnable.
-(cat $(type -p python3); echo) > /tmp/bin-python; chmod +x /tmp/bin-python
+(cat $(type -p $pa_python); echo) > /tmp/bin-python; chmod +x /tmp/bin-python
 ln -s /tmp/bin-python .python
 (. $pactivate -q 2>err-diffwarn && pip --version) \
     || fail "pip --version didn't work"
@@ -121,8 +129,8 @@ clean_virtualenv
 #   We use a relative symlink here to ensure that pactivate finds the absolute
 #   path to it, rather than re-using the relative path at a different
 #   directory level and thus having the link point to the wrong place.
-echo ln -s ../$(type python3) .python
-ln -s ../$(type -p python3) .python
+echo ln -s ../$(type $pa_python) .python
+ln -s ../$(type -p $pa_python) .python
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 echo '───── removing .python symlink'
 #   A virtualenv created with the .python symlink should still work even
