@@ -76,6 +76,14 @@ else
     }
 fi
 
+echo '━━━━━ bad python interpreter error'
+ln -s /does/not/exist .python
+. $pactivate 2>err-badinterp && fail "didn't fail for bad interpreter"
+echo '───── error output:'; cat err-badinterp
+[[ 'pactivate: bad python interpreter' == $(tail -1 err-badinterp) ]] \
+    || fail "bad message"
+rm .python
+
 echo '━━━━━ run pactivate clean'
 #   This does the full bootstrap and virtualenv creation
 (. $pactivate)
