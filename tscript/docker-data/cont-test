@@ -28,7 +28,7 @@ echo "DISTRO='$DISTRO' TEST_QUIET='$TEST_QUIET' TEST_INTERACT='$TEST_INTERACT'"
 pactivate="./pactivate ${TEST_QUIET:+-q}"
 build=/test/.build
 virtualenv=$build/virtualenv
-bsve=$build/bootstrap/pactivate
+bsve=$build/bootstrap/pactivate     # updated to actual path below
 
 case "$DISTRO" in
     debian:*|ubuntu:*)      debian_tests=true;;
@@ -79,6 +79,9 @@ fi
 echo '━━━━━ run pactivate clean'
 #   This does the full bootstrap and virtualenv creation
 (. $pactivate)
+#   Update $bsve to actual bootstrap path, which may have a version num at end.
+bsve=$(echo $bsve*); echo "bsve=$bsve"
+#   And now the actual pactivate clean tests
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
 $virtualenv/bin/pip --version || fail "pip --version didn't work"
