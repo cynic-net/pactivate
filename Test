@@ -23,8 +23,7 @@ while [[ ${#@} -gt 0 ]]; do case "$1" in
     *)      break;;
 esac; done
 #   Default images to test:
-[[ ${#@} -eq 0 ]] \
-    && set python:3.10-alpine  debian:11 ubuntu:22.04
+[[ ${#@} -eq 0 ]] && set $(grep -v '^#' tscript/pactivate.arg)
 
 header() {
     echo '┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
