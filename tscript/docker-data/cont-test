@@ -113,10 +113,8 @@ clean_virtualenv
 #   We use a relative symlink here to ensure that pactivate finds the absolute
 #   path to it, rather than re-using the relative path at a different
 #   directory level and thus having the link point to the wrong place.
-    ls -l .python ../$(type -p python3) || true # XXX
 echo ln -s ../$(type python3) .python
 ln -s ../$(type -p python3) .python
-    ls -l .python || true # XXX
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 echo '───── removing .python symlink'
 #   A virtualenv created with the .python symlink should still work even
