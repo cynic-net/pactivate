@@ -135,13 +135,13 @@ rm .python
 echo '━━━━━ pactivate with -[Bb] and requirements.txt'
 echo '───── building altbase'
 altbase=/test/test-requirements; mkdir -p $altbase
-echo 'pyyaml>=5' > $altbase/requirements.txt
+echo 'six>=1' > $altbase/requirements.txt
 echo '───── running build'
 (cd /tmp && . /test/$pactivate -B $altbase -b $altbase/build) \
     || fail "build failure"
-echo '───── testing yaml import'
-$altbase/build/virtualenv/bin/python -c 'import yaml' \
-    || fail "yaml import failure; requirements.txt broken?"
+echo '───── testing six import'
+$altbase/build/virtualenv/bin/python -c 'import six' \
+    || fail "six import failure; requirements.txt broken?"
 
 if $debian_tests; then
     echo '━━━━━ run pactivate with Python 2 and requirements.txt'

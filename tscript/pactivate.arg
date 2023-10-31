@@ -15,4 +15,5 @@ python:3.8-alpine
 #   Obsolete releases for which we have special behaviour.
 python:3.6-alpine
 python:3.5-alpine
-#python:3.4-alpine      # yaml package used for test does not work on 3.0-3.4
+python:3.4-alpine
+#   No images available for 3.0 - 3.3
