@@ -75,7 +75,7 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
     }
     #   get-pip.py produces spurious upgrade notices on older Python versions
     #   such as 3.6 or 2.7; --disable-pip-version-check suppresses these.
-    curl '-#' ${__pa_quiet:+--silent} \
+    curl --retry 3 --connect-timeout 10 '-#' ${__pa_quiet:+--silent} \
         "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \
         | "$__pa_python" - \
             $__pa_quiet -t "$__pa_bootdir" --disable-pip-version-check \

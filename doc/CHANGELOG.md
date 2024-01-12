@@ -14,6 +14,7 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 - Fixed: Now works with Python 3.12, and no more distuils warning on 3.11.
+- Fixed: Longer timeouts and more than one retry for curl.
 
 ### pactivate 0.4.0 (2023-10-31)
 - Added: If `python3` is not available, we try `python` as well. (Under
