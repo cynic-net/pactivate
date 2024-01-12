@@ -1,4 +1,4 @@
-#   pactivate version 0.4.0   https://github.com/cynic-net/pactivate
+#   pactivate version 0.4.0-current   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -64,7 +64,11 @@ mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
     #   Debian-based systems do not incude distutils in the standard
     #   python3 package; check that it's available and, if not, print a
     #   more informative message than the ModuleNotFoundError.
-    "$__pa_python" -c 'import distutils.cmd' || {
+    "$__pa_python" -c '
+import sys
+M, m = sys.version_info[0], sys.version_info[1]         # Major, minor
+if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
+        ' || {
         echo 1>&2 \
             "Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
         return 3

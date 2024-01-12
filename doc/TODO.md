@@ -3,14 +3,6 @@ To Do
 
 ### Bugs and Infelicities
 
-- On Python 3.11, during `Installing bootstrap pip` we see a warning,
-  `DeprecationWarning: The distutils package is deprecated and slated for
-  removal in Python 3.12.` This appears to be due to our `"$__pa_python" -c
-  'import distutils.cmd' || ...` used to generate a nice error message if
-  distutils isn't installed (because we expect a failure in Python ≤3.11 if
-  it's not). Probably what we need is a Python version test around that
-  `import distutils.cmd` test.
-
 - If the path given to `pae` has a `pactivate` in it, that should be used
   instead of the default `pactivate` that `pae` downloads. (This ensures
   that it functions the same way as the build system presumably using that
