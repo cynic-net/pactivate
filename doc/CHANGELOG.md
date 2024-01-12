@@ -13,6 +13,8 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 #### -current
+
+#### pactivate 0.5.0 (2024-01-12)
 - Fixed: Now works with Python 3.12, and no more distuils warning on 3.11.
 - Fixed: Longer timeouts and more than one retry for curl.
 - Test framework: Do not try to test distutils check on newer versions of
