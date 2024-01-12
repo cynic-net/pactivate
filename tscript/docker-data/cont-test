@@ -30,10 +30,18 @@ build=/test/.build
 virtualenv=$build/virtualenv
 bsve=$build/bootstrap/pactivate     # updated to actual path below
 
+#   Debian ≥12 and Ubuntu ≥23 use a Python 3.x with distutils deprecated/gone.
+debian_distutils_test=false
 case "$DISTRO" in
-    debian:*|ubuntu:*)      debian_tests=true;;
-    *)                      debian_tests=false;;
+    debian:*)
+        [[ ${DISTRO#debian:} -le 11 ]] && debian_distutils_test=true;;
+    ubuntu:*)
+        ver="${DISTRO#ubuntu:}"
+        major_ver="${ver%%.[0-9]*}"
+        [[ $major_ver -le 22 ]] && debian_distutils_test=true
+        ;;
 esac
+$debian_distutils_test && echo '───── Enabling old Debian distutils tests'
 
 clean_virtualenv() { rm -rf "$virtualenv"; }
 
@@ -65,7 +73,7 @@ echo '━━━━━ unknown argument error'
 [[ 'pactivate: unknown argument: xyz' == $(cat err-args) ]] \
     || { cat err-args; fail "bad message"; }
 
-if ! $debian_tests; then
+if ! $debian_distutils_test; then
     echo '━━━━━ (Debian distutils tests skipped)'
 else
     echo '━━━━━ run pactivate without distutils'
@@ -151,7 +159,9 @@ echo '───── testing six import'
 $altbase/build/virtualenv/bin/python -c 'import six' \
     || fail "six import failure; requirements.txt broken?"
 
-if $debian_tests; then
+if [[ ! -x /usr/bin/python2 ]]; then
+    echo '━━━━━ (Python 2 tests skipped)'
+else
     echo '━━━━━ run pactivate with Python 2 and requirements.txt'
     #   Alternate base dir configured for different Python interpreter.
     altbase=/test/altbase; mkdir -p $altbase

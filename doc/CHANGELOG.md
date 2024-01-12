@@ -15,6 +15,11 @@ specific releases can also be fetched via the Git commit ID.)
 #### -current
 - Fixed: Now works with Python 3.12, and no more distuils warning on 3.11.
 - Fixed: Longer timeouts and more than one retry for curl.
+- Test framework: Do not try to test distutils check on newer versions of
+  Debian and Ubuntu where distutils is deprecated/removed.
+- Test framework: Do not attempt to install and test python2 on recent
+  Debian/Ubuntu systems that do not have a `python2` package.
+- Test framework: Add `debian:12` and `ubuntu:23.10`.
 
 ### pactivate 0.4.0 (2023-10-31)
 - Added: If `python3` is not available, we try `python` as well. (Under

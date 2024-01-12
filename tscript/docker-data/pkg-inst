@@ -8,10 +8,10 @@ alpine() {
 
 debian() {  # Debian/Ubuntu package install
     apt-get -qq update
-    apt-get install -y -qq \
-        curl python3 python2 \
+    apt-get install -y -qq curl python3 \
         vim-tiny                                    # for debugging
     #   Note no python3-distutils here! We test error message when not present.
+    apt-get install -y -qq python2 || true          # fine if not available
 }
 
 echo '─────' "$0" "$@"
