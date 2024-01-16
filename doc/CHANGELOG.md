@@ -14,6 +14,10 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 
+#### pae 0.6.0 (2024-01-16)
+- Added: `pae -c` now takes an option parameter for an alternate Python
+  interpreter.
+
 #### pactivate 0.5.1 (2024-01-16)
 - Fixed: New fix for curl timeout failures: retry forcing IPv4.
 

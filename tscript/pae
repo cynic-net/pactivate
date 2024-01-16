@@ -88,5 +88,16 @@ echo '━━━━━ pae --rm te0'
 output=$(2>&1 pae --rm te0)
 [[ -e "$PAE_HOME"/te0 ]] && fail 'environment not removed'
 
+echo '━━━━━ pae -c te-p'
+#   It's a lot of work to build a separate Python interpreter, but pactivate
+#   using the .python link has already been tested, so we can simply verify
+#   here that pae created the link.
+output=$(2>&1 pae -c te-p $(type -p python3))
+[[ -r "$PAE_HOME"/te-p/.build/virtualenv/pyvenv.cfg ]] \
+    || fail 'no pyenv.cfg'
+[[ -L "$PAE_HOME"/te-p/.python ]] || fail 'no .python link'
+output=$(2>&1 pae --rm te-p)
+[[ -L "$PAE_HOME"/te-p/.python ]] && fail '.python link not removed'
+
 echo '━━━━━ TESTS COMPLETE'
 TEST_PASSED=true

@@ -1,4 +1,4 @@
-#   pae version 0.5.3   https://github.com/cynic-net/pactivate
+#   pae version 0.6.0   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -25,7 +25,8 @@ Usage:
     pae -a NAME             # activate a virtual env
     pae -d                  # deactivate the current virtual env
     pae -l                  # list virtual env dirs in virtual env home
-    pae -c NAME             # create a virtual env
+    pae -c NAME [PATH]      # create a virtual env using default Python or
+                            #   Python interpteter at PATH if specified
     pae --rm NAME           # remove a virtual env created by pae
                             #   (this will not remove non-pae files)
     pae -U                  # update the pactivate used by this function
@@ -103,7 +104,7 @@ pae() {
     if [[ ${#@} -eq 0 ]]; then
         [[ $action == deactivate ]] || {
             echo 1>&2 "pae: missing parameter (-h for help)"; return 2; }
-    elif [[ ${#@} -ne 1 && $action != run ]]; then
+    elif [[ ${#@} -ne 1 && $action != run && $action != create ]]; then
         echo 1>&2 "pae: too many parameters:" "$@"; return 2
     else
         if [[ $1 != ${1##*/} ]]; then   # If there's a slash in the name,
@@ -172,6 +173,9 @@ pae() {
             }
             [[ -r "$pae_home/pactivate" ]] || __pae_update_pactivate "$pae_home"
             mkdir -p "$vedir"
+            if [[ ${#@} -ge 1 ]]; then  # alternate Python interpreter provided
+                (cd "$vedir" && ln -s "$1" .python)
+            fi
             cat >"$vedir/README" <<_____
 .build/virtualenv/ is a pactivate environment created by pae.
 For more information, see https://github.com/cynic-net/pactivate
@@ -195,6 +199,9 @@ _____
             fi
             #   Remove the virtualenv and its bootstrap.
             rm -rf "$vedir"/.build/{bootstrap/pactivate,virtualenv}
+            #   Remove any .python interpreter link, if present.
+            #   (Probably we created; nobody else should have!)
+            rm -f "$vedir"/.python
             #   Attempt to remove remaining directories; fail quietly
             #   if they're not empty as we handle that later.
             rmdir >/dev/null 2>&1 "$vedir"/.build/bootstrap "$vedir"/.build \
