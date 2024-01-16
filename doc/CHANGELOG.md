@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 
+#### pactivate 0.5.1 (2024-01-16)
+- Fixed: New fix for curl timeout failures: retry forcing IPv4.
+
 #### pactivate 0.5.0 (2024-01-12)
 - Fixed: Now works with Python 3.12, and no more distuils warning on 3.11.
 - Fixed: Longer timeouts and more than one retry for curl.
