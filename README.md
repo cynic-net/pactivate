@@ -8,7 +8,7 @@ particular it will bootstrap without virtualenv or even Pip, and never
 touch the user or system Python environment. It works with any version of
 Python supported by [`get-pip.py`], i.e., 2.7 onward.
 
-A `pae` shell function that provides functionality similar to
+A `pae` Bash shell function that provides functionality similar to
 [virtualenvwrapper] is also provided. See the [documentation][pae] and the
 [`pae`](./pae) file for details.
 
