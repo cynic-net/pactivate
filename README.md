@@ -9,8 +9,9 @@ touch the user or system Python environment. It works with any version of
 Python supported by [`get-pip.py`], i.e., 2.7 onward.
 
 A `pae` Bash shell function that provides functionality similar to
-[virtualenvwrapper] is also provided. See the [documentation][pae] and the
-[`pae`](./pae) file for details.
+[virtualenvwrapper], [pipx] and the like is also provided. See the
+[pae documentation][pae] and the [`pae`](./pae) file for details. There
+is also a [detailed comparison with pipx][vs-pipx].
 
 This documentation assumes you already have a general understanding of
 [virtualenv] virtual environments and know how to use the [`activate`]
@@ -282,7 +283,9 @@ contents of this file are ignored.)
 [`venv`]: https://docs.python.org/3/library/venv.html
 [docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
 [pae]: ./doc/pae.md
+[pipx]: https://pipx.pypa.io/
 [req]: https://pip.pypa.io/en/stable/reference/requirements-file-format/
 [source]: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-_002e
 [virtualenv]: https://virtualenv.pypa.io/
 [virtualenvwrapper]: https://pypi.org/project/virtualenvwrapper/
+[vs-pipx]: ./doc/vs-pipx.md

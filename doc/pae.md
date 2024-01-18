@@ -3,7 +3,8 @@ pae: Execute Commands in and Manage pactivate Python Virtual Environments
 
 `pae` is a Bash shell function that creates, lists, activates, removes and
 executes commands in Python virtual environments created by [`pactivate`].
-(This functionality is similar to that of [virtualenvwrapper].)
+This functionality is similar to that of [virtualenvwrapper] and [pipx];
+see ["Comparison of pae vs. pipx"][vs-pipx].
 
 ### Installation
 
@@ -164,4 +165,7 @@ github.com. You can update that version with `pae -U`:
 
 
 <!-------------------------------------------------------------------->
+[`pactivate`]: https://github.com/cynic-net/pactivate
+[pipx]: https://pipx.pypa.io/
 [virtualenvwrapper]: https://pypi.org/project/virtualenvwrapper/
+[vs-pipx]: ./vs-pipx.md
