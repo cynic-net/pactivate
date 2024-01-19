@@ -14,6 +14,10 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 
+#### pae 0.7.0 (2024-01-20)
+- Changed: -c option now does not leave virtualenv activated
+- Added: -C option to leave new virtualenv activated
+
 #### pae 0.6.0 (2024-01-16)
 - Added: `pae -c` now takes an option parameter for an alternate Python
   interpreter.

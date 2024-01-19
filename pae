@@ -1,4 +1,4 @@
-#   pae version 0.6.0   https://github.com/cynic-net/pactivate
+#   pae version 0.7.0   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -27,6 +27,7 @@ Usage:
     pae -l                  # list virtual env dirs in virtual env home
     pae -c NAME [PATH]      # create a virtual env using default Python or
                             #   Python interpteter at PATH if specified
+    pae -C NAME [PATH]      # leave environment activated after create
     pae --rm NAME           # remove a virtual env created by pae
                             #   (this will not remove non-pae files)
     pae -U                  # update the pactivate used by this function
@@ -85,7 +86,8 @@ pae() {
     action=run
     while [[ ${#@} -gt 0 ]]; do case "$1" in
         -a)     shift; action=activate;;
-        -c)     shift; action=create;;
+        -c)     shift; action=create; local activate_after_create=false;;
+        -C)     shift; action=create; local activate_after_create=true;;
         -d)     shift; action=deactivate;;
         -h)     __pae_usage; return 0;;
         -l)     shift;
@@ -180,7 +182,11 @@ pae() {
 .build/virtualenv/ is a pactivate environment created by pae.
 For more information, see https://github.com/cynic-net/pactivate
 _____
-            . "$pae_home/pactivate" $quiet -B "$vedir"
+            if $activate_after_create; then
+                . "$pae_home/pactivate" $quiet -B "$vedir"
+            else
+                (. "$pae_home/pactivate" $quiet -B "$vedir")
+            fi
             ;;
         remove)
             #   NOTE: This works only with pae-fromat environments; it's not

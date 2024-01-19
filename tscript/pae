@@ -62,9 +62,9 @@ else
 fi
 
 echo '━━━━━ pae -c te0'
-output=$(2>&1 pae -c te0)
-[[ -r "$PAE_HOME"/te0/.build/virtualenv/pyvenv.cfg ]] \
-    || fail 'no pyenv.cfg'
+pae -c te0
+[[ -z ${VIRTUAL_ENV-} ]] || fail "-c should not have activated virtualenv"
+[[ -r "$PAE_HOME"/te0/.build/virtualenv/pyvenv.cfg ]] || fail 'no pyenv.cfg'
 
 echo '━━━━━ pae -l'
 output=$(2>&1 pae -l)
@@ -88,11 +88,15 @@ echo '━━━━━ pae --rm te0'
 output=$(2>&1 pae --rm te0)
 [[ -e "$PAE_HOME"/te0 ]] && fail 'environment not removed'
 
-echo '━━━━━ pae -c te-p'
+echo '━━━━━ pae -C te-p'
 #   It's a lot of work to build a separate Python interpreter, but pactivate
 #   using the .python link has already been tested, so we can simply verify
 #   here that pae created the link.
-output=$(2>&1 pae -c te-p $(type -p python3))
+#   To save time, this also tests that -C activates the virtualenv.
+pae -C te-p $(type -p python3)
+[[ ${VIRTUAL_ENV-} =~ /te-p/ ]] \
+    || fail "-C did not activate virtualenv (VIRTUALENV='${VIRTUAL_ENV-}')"
+pae -d
 [[ -r "$PAE_HOME"/te-p/.build/virtualenv/pyvenv.cfg ]] \
     || fail 'no pyenv.cfg'
 [[ -L "$PAE_HOME"/te-p/.python ]] || fail 'no .python link'
