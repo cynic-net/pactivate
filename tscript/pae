@@ -33,12 +33,13 @@ cd /    # Ensure we're not dependent on CWD
 #   Tests
 
 echo '━━━━━ no arguments error'
-if output=$(2>&1 pae); then
-    fail "Accepted no args."
-else
-    [[ $output =~ "missing parameter"  ]] \
-        || fail "bad message:\n  $output"
-fi
+output=$(2>&1 pae) && fail "Accepted no args."
+[[ $output =~ 'missing parameter'  ]] || fail "bad message:\n  $output"
+
+echo '━━━━━ bad argument error'
+output=$(2>&1 pae -Y) && fail "Accepted bad arg -Y."
+[[ $output =~ 'bad option: -Y (-h for help)'  ]] \
+    || fail "bad message:\n  $output"
 
 echo '━━━━━ pae -h'
 output=$(pae -h)
