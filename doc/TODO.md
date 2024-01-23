@@ -14,6 +14,9 @@ To Do
 - On Windows (MinGW) the default Python interpreter (when there is no
   `$BASE/.python` link) should be `py`, not `python3`. (This may already
   be working, but we have no test for it.)
+- `pae -p PATH -c ...` should also accept a version specification such as
+  `-p 3.12` and pae should find an interpreter matching that provided by
+  pythonz or other tools.
 
 ### Consider
 

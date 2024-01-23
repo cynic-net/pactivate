@@ -1,4 +1,4 @@
-#   pae version 0.7.0   https://github.com/cynic-net/pactivate
+#   pae version 0.8.0   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -25,9 +25,9 @@ Usage:
     pae -a NAME             # activate a virtual env
     pae -d                  # deactivate the current virtual env
     pae -l                  # list virtual env dirs in virtual env home
-    pae -c NAME [PATH]      # create a virtual env using default Python or
+    pae [-p PATH] -c NAME   # create a virtual env using default Python or
                             #   Python interpteter at PATH if specified
-    pae -C NAME [PATH]      # leave environment activated after create
+    pae [-p PATH] -C NAME   # leave environment activated after create
     pae --rm NAME           # remove a virtual env created by pae
                             #   (this will not remove non-pae files)
     pae -U                  # update the pactivate used by this function
@@ -84,10 +84,12 @@ pae() {
     #   $action: parse command line arguments
     quiet=-q
     action=run
+    pinterp=
     while [[ ${#@} -gt 0 ]]; do case "$1" in
         -a)     shift; action=activate;;
         -c)     shift; action=create; local activate_after_create=false;;
         -C)     shift; action=create; local activate_after_create=true;;
+        -p)     shift; pinterp="$1"; shift;;
         -d)     shift; action=deactivate;;
         -h)     __pae_usage; return 0;;
         -l)     shift;
@@ -175,8 +177,13 @@ pae() {
             }
             [[ -r "$pae_home/pactivate" ]] || __pae_update_pactivate "$pae_home"
             mkdir -p "$vedir"
-            if [[ ${#@} -ge 1 ]]; then  # alternate Python interpreter provided
-                (cd "$vedir" && ln -s "$1" .python)
+            if [[ -n $pinterp ]]; then  # alternate Python interpreter provided
+                echo "Python interpreter: $pinterp"
+                $pinterp -c 'import sys; print(sys.version)' || {
+                    echo 1>&2 "pae: bad python interpreter: $pinterp"
+                    return 2
+                }
+                (cd "$vedir" && ln -s "$pinterp" .python)
             fi
             cat >"$vedir/README" <<_____
 .build/virtualenv/ is a pactivate environment created by pae.

@@ -14,6 +14,12 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 
+#### pae 0.8.0 (2024-01-23)
+- Changed: Now use `pae -p PATH -c ENVNAME` to specify a non-default Python
+  interpreter for the new virtual environment. (`pae -c ENVNAME PATH` is no
+  longer supported.) This is also checked to see if it runs some very basic
+  Python code with -c.
+
 #### pae 0.7.0 (2024-01-20)
 - Changed: -c option now does not leave virtualenv activated
 - Added: -C option to leave new virtualenv activated
