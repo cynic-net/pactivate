@@ -13,8 +13,12 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 #### -current
+
+#### pae 0.8.1 (2024-01-23)
 - Fixed: `pae -p PATH` now handles $PATH searches, e.g., `pae -p python2`.
 - Fixed: `pae --rm` no longer leaves fles behind for Pythons ≤3.6.
+- Added: `pae -c NAME PKG ...`; an optional list of package specs after the
+  name will add those packages to the virtualenv after creation.
 
 #### pae 0.8.0 (2024-01-23)
 - Changed: Now use `pae -p PATH -c ENVNAME` to specify a non-default Python

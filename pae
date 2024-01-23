@@ -1,4 +1,4 @@
-#   pae version 0.8.0   https://github.com/cynic-net/pactivate
+#   pae version 0.8.1   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -25,9 +25,10 @@ Usage:
     pae -a NAME             # activate a virtual env
     pae -d                  # deactivate the current virtual env
     pae -l                  # list virtual env dirs in virtual env home
-    pae [-p PATH] -c NAME   # create a virtual env using default Python or
-                            #   Python interpteter at PATH if specified
-    pae [-p PATH] -C NAME   # leave environment activated after create
+    pae [-p PATH] -c NAME [PKG ...]   # create a virtual env using default
+                            #   Python or interpreter at PATH, and install any
+                            #   packages specified by PKG arguments.
+    pae -C NAME             # as -c, but leave env activated after create
     pae --rm NAME           # remove a virtual env created by pae
                             #   (this will not remove non-pae files)
     pae -U                  # update the pactivate used by this function
@@ -189,6 +190,9 @@ pae() {
 .build/virtualenv/ is a pactivate environment created by pae.
 For more information, see https://github.com/cynic-net/pactivate
 _____
+            for i in "$@"; do
+                echo "$i" >>"$vedir/requirements.txt"
+            done
             if $activate_after_create; then
                 . "$pae_home/pactivate" $quiet -B "$vedir"
             else
@@ -212,9 +216,10 @@ _____
             fi
             #   Remove the virtualenv and its bootstrap.
             rm -rf "$vedir"/.build/{bootstrap/pactivate*,virtualenv}
-            #   Remove any .python interpreter link, if present.
-            #   (Probably we created; nobody else should have!)
-            rm -f "$vedir"/.python
+            #   Remove any .python interpreter link and requirements.txt we may
+            #   have created. (Probably we created; nobody else should have!)
+            rm -f "$vedir"/.python "$vedir"/requirements.txt
+            #   Remove any requirements.txt we may have created
             #   Attempt to remove remaining directories; fail quietly
             #   if they're not empty as we handle that later.
             rmdir >/dev/null 2>&1 "$vedir"/.build/bootstrap "$vedir"/.build \

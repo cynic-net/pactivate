@@ -63,13 +63,15 @@ else
 fi
 
 ####################################################################
-#   Tests: installation, listing, activation, removal
+#   Tests: creation, listing, activation, removal
 
 echo '━━━━━ pae -c te0'
 #   To save time, -C is tested at the same time as -p, below.
 pae -c te0
 [[ -z ${VIRTUAL_ENV-} ]] || fail "-c should not have activated virtualenv"
 [[ -r "$PAE_HOME"/te0/.build/virtualenv/pyvenv.cfg ]] || fail 'no pyenv.cfg'
+[[ -r "$PAE_HOME"/te0/requirements.txt ]] \
+    && fail "requirements.txt should not have been created"
 
 echo '━━━━━ pae -l'
 output=$(2>&1 pae -l)
@@ -110,10 +112,16 @@ echo '━━━━━ pae -p ... -C te-p'
 #   using the .python link has already been tested, so we can simply verify
 #   here that pae created the link. Note that we deliberately test without
 #   a full path.
-#   To save time, this also tests that -C activates the virtualenv.
-pae -p python3 -C te-p1
+#   To save time, this also tests that -C activates the virtualenv and
+#   requirements.txt creation.
+pae -p python3 -C te-p1 six urllib3
 [[ ${VIRTUAL_ENV-} =~ /te-p1/ ]] \
     || fail "-C did not activate virtualenv (VIRTUALENV='${VIRTUAL_ENV-}')"
+rqtxt="$PAE_HOME"/te-p1/requirements.txt
+[[ -r $rqtxt ]] || fail "requirements.txt not created"
+grep -q 'six' "$rqtxt" || fail 'requirements.txt does not contain six'
+grep -q 'urllib3' "$rqtxt" || fail 'requirements.txt does not contain urllib3'
+
 pae -d
 [[ -r "$PAE_HOME"/te-p1/.build/virtualenv/pyvenv.cfg ]] \
     || fail 'no pyenv.cfg'
