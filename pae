@@ -211,7 +211,7 @@ _____
                 rm -f "$vedir"/README
             fi
             #   Remove the virtualenv and its bootstrap.
-            rm -rf "$vedir"/.build/{bootstrap/pactivate,virtualenv}
+            rm -rf "$vedir"/.build/{bootstrap/pactivate*,virtualenv}
             #   Remove any .python interpreter link, if present.
             #   (Probably we created; nobody else should have!)
             rm -f "$vedir"/.python

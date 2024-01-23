@@ -14,6 +14,7 @@ specific releases can also be fetched via the Git commit ID.)
 
 #### -current
 - Fixed: `pae -p PATH` now handles $PATH searches, e.g., `pae -p python2`.
+- Fixed: `pae --rm` no longer leaves fles behind for Pythons ≤3.6.
 
 #### pae 0.8.0 (2024-01-23)
 - Changed: Now use `pae -p PATH -c ENVNAME` to specify a non-default Python
