@@ -13,6 +13,7 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 #### -current
+- Fixed: `pae -p PATH` now handles $PATH searches, e.g., `pae -p python2`.
 
 #### pae 0.8.0 (2024-01-23)
 - Changed: Now use `pae -p PATH -c ENVNAME` to specify a non-default Python

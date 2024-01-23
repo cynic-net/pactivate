@@ -183,7 +183,7 @@ pae() {
                     echo 1>&2 "pae: bad python interpreter: $pinterp"
                     return 2
                 }
-                (cd "$vedir" && ln -s "$pinterp" .python)
+                (cd "$vedir" && ln -s "$(type -p "$pinterp")" .python)
             fi
             cat >"$vedir/README" <<_____
 .build/virtualenv/ is a pactivate environment created by pae.

@@ -108,9 +108,10 @@ output=$(2>&1 pae -p /usr/bin/env -c te-p0) && fail "bad -p path not caught"
 echo '━━━━━ pae -p ... -C te-p'
 #   It's a lot of work to build a separate Python interpreter, but pactivate
 #   using the .python link has already been tested, so we can simply verify
-#   here that pae created the link.
+#   here that pae created the link. Note that we deliberately test without
+#   a full path.
 #   To save time, this also tests that -C activates the virtualenv.
-pae -p "$(type -p python3)" -C te-p1
+pae -p python3 -C te-p1
 [[ ${VIRTUAL_ENV-} =~ /te-p1/ ]] \
     || fail "-C did not activate virtualenv (VIRTUALENV='${VIRTUAL_ENV-}')"
 pae -d
