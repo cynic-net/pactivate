@@ -63,7 +63,7 @@ else
 fi
 
 ####################################################################
-#   Tests: creation, listing, activation, removal
+#   Tests: creation, listing, activation, run, removal
 
 echo '━━━━━ pae -c te0'
 #   To save time, -C is tested at the same time as -p, below.
@@ -90,6 +90,19 @@ pae -d
 echo '━━━━━ pae -d # not activated'
 output=$(2>&1 pae -d) || true
 [[ $output =~ 'no deactivate()' ]] || fail "bad output:\n  $output"
+
+echo '━━━━━ pae -r ...'
+pae -r te0 pip install six || fail "run with environment name"
+#   As well as testing with an environment name (above), we also test
+#   with an explicit path. This includes multiple adjacent slashes and
+#   trailing slashes while running `python` to surface the "multi-slash"
+#   bug, if present. (See the fix of $vedir for this in the source.)
+#   XXX Unfortunately, this doesn't seem to trigger the bug when the fix
+#   isn't present.; only cjs has been able to reproduce it by hand.
+(cd $PAE_HOME && pae .//te0// python -c 'import six') \
+    || fail 'run with explicit dir and multiple slashes'
+
+TEST_PASSED=true; exit 0
 
 echo '━━━━━ pae --rm te0'
 output=$(2>&1 pae --rm te0)

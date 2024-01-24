@@ -1,4 +1,4 @@
-#   pae version 0.8.1   https://github.com/cynic-net/pactivate
+#   pae version 0.8.2   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -115,7 +115,7 @@ pae() {
         if [[ $1 != ${1##*/} ]]; then   # If there's a slash in the name,
             vedir="$1"                  #   we've been given a path.
         elif [[ $1 == . ]]; then        # Or if it's just `.`,
-            vedir=./                    #   it's also a path.
+            vedir=.                     #   it's also a path.
         else                            # Otherwise it's a name.
             [[ $1 == .* || $1 == .. ]] && {
                 echo 1>&2 "pae: bad virtualenv name: $1"
@@ -124,6 +124,13 @@ pae() {
             vedir="$pae_home/$1"
         fi
         shift                           # remove last param
+        #   While scripts under the virtualenv bin/ don't care about this,
+        #   the bin/python binary there gets confused by adjacent slashes
+        #   in its path (e.g., `bin//python`) and will not add the
+        #   virtualenv's libraries to sys.path. To avoid this problem, we
+        #   replace all adjacent slashes in $vedir with a single slash, and
+        #   also remove any trailing slashes.
+        vedir=$(echo "$vedir" | sed -e 's,//*,/,g' -e 's,/$,,')
     fi
 
     case $action in
