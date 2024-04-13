@@ -12,9 +12,15 @@ number and stays there until the next release, when `-curent` is removed
 and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
-#### pactivate-current
+### -current
+
+#### pactivate 0.5.2 (2024-04-14)
+- Added: Support for running on Windows under MINGW.
 - Fixed: Support scripts installed by virtualenv under $venv/Scripts/ (as
   used on Windows) as well as $venv/bin/ (as used on Linux).
+- Fixed: Use `python -m pip` instead of `pip` for bootstrap virtualenv
+  package install because if you use `pip.exe` under Windows, it locks that
+  file and then dies because it can't replace it.
 - Test framework: Add `local-test` script to run a test in the current
   environment, rather than a in Docker container. The build directory
   for the test is `.local-test/`. This now allows testing under Windows

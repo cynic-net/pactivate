@@ -1,4 +1,4 @@
-#   pactivate version 0.5.1-current   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.2   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -97,7 +97,9 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
     #   messages; --upgrade suppresses these. However, --upgrade also seems
     #   to entirely remove the bin/ directory, so we "re-install" pip
     #   (which will not re-download it) to restore bin/pip as well.
-    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" \
+    #   Note that we _must_ use `python -m pip` because, on Windows due to
+    #   file locking, pip is unable to replace itself if you run it as pip.exe.
+    PYTHONPATH="$__pa_bootdir" "$__pa_python" -m pip \
         $__pa_quiet install --upgrade -t "$__pa_bootdir" pip virtualenv
 }
 
