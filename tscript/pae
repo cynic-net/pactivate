@@ -47,7 +47,7 @@ output=$(pae -h)
     || fail "bad message: $output"
 
 echo '━━━━━ pae -D'
-(   cd $PAE_HOME
+(   cd "$PAE_HOME"
     rm -f pactivate
     pae -D
     ls -l pactivate
@@ -99,7 +99,7 @@ pae -r te0 pip install six || fail "run with environment name"
 #   bug, if present. (See the fix of $vedir for this in the source.)
 #   XXX Unfortunately, this doesn't seem to trigger the bug when the fix
 #   isn't present.; only cjs has been able to reproduce it by hand.
-(cd $PAE_HOME && pae .//te0// python -c 'import six') \
+(cd "$PAE_HOME" && pae .//te0// python -c 'import six') \
     || fail 'run with explicit dir and multiple slashes'
 
 TEST_PASSED=true; exit 0
