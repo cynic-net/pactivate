@@ -56,6 +56,22 @@ environments:
   - pae requires extra packages only on Debian 11/Ubuntu 21.10 and below,
     where it requires the OS `python3-distutils` package.
 
+### Command Comparison
+
+Here are some common pipx commands and their pae equivalents:
+
+      pipx                      pae
+      ──────────────────────────────────────────────────────
+      pipx install PKG          pae -c PKG PKG
+      PKG                       pae PKG
+      pipx list                 pae -l
+      pipx inject APKG BPKG     pae APKG pip install BPKG
+      ─                         pae PKG PROG       # run another program in PKG
+
+If the executable name doesn't match the package name, pae can handle this
+by letting you use the executable name as the virtual environment name:
+`pae -c PROG PKG`, so `pae PROG` will run that program. It's not clear to
+me how to do this with pipx.
 
 
 <!-------------------------------------------------------------------->
