@@ -13,6 +13,7 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+- Test framework: On Debian use python3-minimal instead of python3
 
 #### pactivate 0.5.3 (2024-04-14)
 - Fixed: Python 3.7 now uses its own alternate version of get-pip.py as
