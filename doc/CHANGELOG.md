@@ -14,6 +14,10 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+#### pactivate 0.5.3 (2024-04-14)
+- Fixed: Python 3.7 now uses its own alternate version of get-pip.py as
+  newer versions no longer support 3.7.
+
 #### pactivate 0.5.2 (2024-04-14)
 - Added: Support for running on Windows under MINGW.
 - Fixed: Support scripts installed by virtualenv under $venv/Scripts/ (as
