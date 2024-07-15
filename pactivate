@@ -1,4 +1,4 @@
-#   pactivate version 0.5.3   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.4   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -120,9 +120,18 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         echo
     fi
     echo -n "Version: " && "$__pa_python" --version
+    #   1. Use virtualenv to create the new virtualenv.
+    #   2. Upgrade pip to the latest version, because often the get_pip.py
+    #      version is old enough that we'll get annoying upgrade messages
+    #      with every use if we don't do this. To reduce output size, we
+    #      do this quietly and display the new version after. (The old
+    #      version is displayed in the virtualenv creation output.)
+    #   3. If we have a requirements file, install its contents.
     PYTHONPATH="$__pa_bootdir" "$__pa_python_deref" -s -m virtualenv \
         $__pa_quiet --prompt $(basename "$__pa_basedir") \
         "$__pa_builddir/virtualenv/" \
+    && "$__pa_builddir"/virtualenv/[bS]*/pip install -q -U pip \
+    && "$__pa_builddir"/virtualenv/[bS]*/pip --version \
     && [[ -f "$__pa_requirements" ]] \
     && "$__pa_builddir"/virtualenv/[bS]*/pip \
         install $__pa_quiet -r "$__pa_requirements"

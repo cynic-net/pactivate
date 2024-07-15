@@ -13,6 +13,10 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+
+#### pactivate 0.5.4 (2024-07-16)
+- Added: Upgrade pip to latest version as part of virtualenv install.
+  (This avoids annoying "please upgrade" messages during virtualenv use.)
 - Test framework: On Debian use python3-minimal instead of python3
 - Test framework: Restore accidentally-disabled pae tests
 
