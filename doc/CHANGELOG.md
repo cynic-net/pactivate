@@ -14,6 +14,7 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 - Test framework: On Debian use python3-minimal instead of python3
+- Test framework: Restore accidentally-disabled pae tests
 
 #### pactivate 0.5.3 (2024-04-14)
 - Fixed: Python 3.7 now uses its own alternate version of get-pip.py as

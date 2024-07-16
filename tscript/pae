@@ -102,8 +102,6 @@ pae -r te0 pip install six || fail "run with environment name"
 (cd "$PAE_HOME" && pae .//te0// python -c 'import six') \
     || fail 'run with explicit dir and multiple slashes'
 
-TEST_PASSED=true; exit 0
-
 echo '━━━━━ pae --rm te0'
 output=$(2>&1 pae --rm te0)
 [[ -e "$PAE_HOME"/te0 ]] && fail 'environment not removed'
