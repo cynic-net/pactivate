@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+#   WARNING: These tests use the _production_ version of pactivate
+#   as available on the `main` branch on GitHub.
+#
 set -eu -o pipefail
 
 output=
