@@ -5,7 +5,7 @@ python:2.7-alpine
 debian:11
 debian:12
 ubuntu:22.04
-ubuntu:23.10
+ubuntu 24.04
 
 #   Upcoming releases and remaining "standard" intermediate releases
 python:3.13-rc-alpine
