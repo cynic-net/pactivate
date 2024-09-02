@@ -14,6 +14,10 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.5 (2024-09-02)
+- Fixed: Pip upgrade added in 0.5.4 fixed for Windows. (Needed to
+  run `python -m pip`, not `pip`.)
+
 #### pactivate 0.5.4 (2024-07-16)
 - Added: Upgrade pip to latest version as part of virtualenv install.
   (This avoids annoying "please upgrade" messages during virtualenv use.)
