@@ -1,4 +1,4 @@
-#   pactivate version 0.5.5-current   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.6   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294

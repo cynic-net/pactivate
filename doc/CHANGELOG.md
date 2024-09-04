@@ -13,6 +13,8 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+
+### pactivate 0.5.6 (2024-09-04)
 - Fixed: Suppress pointless "py is not python" warning on Windows.
 - Fixed: `cmp` command argument needed to be quoted.
 - Test framework: Fix broken 'ubuntu:24.04' test parameter
