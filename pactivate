@@ -1,4 +1,4 @@
-#   pactivate version 0.5.5   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.5-current   https://github.com/cynic-net/pactivate
 
 [ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
@@ -139,7 +139,7 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         install $__pa_quiet -r "$__pa_requirements"
 }
 
-cmp -s $(type -p "$__pa_python") "$__pa_builddir"/virtualenv/[bS]*/python || (
+cmp -s "$(type -p "$__pa_python")" "$__pa_builddir"/virtualenv/[bS]*/python || (
     echo 1>&2 "WARNING:" \
         "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
         "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \
