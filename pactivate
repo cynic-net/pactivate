@@ -139,12 +139,20 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         install $__pa_quiet -r "$__pa_requirements"
 }
 
-cmp -s "$(type -p "$__pa_python")" "$__pa_builddir"/virtualenv/[bS]*/python || (
-    echo 1>&2 "WARNING:" \
-        "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
-        "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \
-        "is not $__pa_python" \
-        "($("$__pa_python" --version 2>&1))" \
+#   On Windows when we're using the default `py` "interpreter," we're
+#   actually using a program that selects a Python interpreter. The
+#   selected interpreter will be the binary installed into Scripts/python
+#   in the virtualenv, but that's obviously not the py program, so the
+#   following check would always fail.
+[[ $__pa_python == py ]] \
+    || cmp -s "$(type -p "$__pa_python")" \
+        "$__pa_builddir"/virtualenv/[bS]*/python \
+    || (
+        echo 1>&2 "WARNING:" \
+            "${__pa_builddir#$__pa_basedir/}"/virtualenv/[bS]*/python \
+            "($("$__pa_builddir"/virtualenv/[bS]*/python --version 2>&1))" \
+            "is not $__pa_python" \
+            "($("$__pa_python" --version 2>&1))" \
     )
 
 . "$__pa_builddir"/virtualenv/[bS]*/activate
