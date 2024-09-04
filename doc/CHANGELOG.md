@@ -15,6 +15,7 @@ specific releases can also be fetched via the Git commit ID.)
 ### -current
 - Fixed: Suppress pointless "py is not python" warning on Windows.
 - Fixed: `cmp` command argument needed to be quoted.
+- Test framework: Fix broken 'ubuntu:24.04' test parameter
 
 ### pactivate 0.5.5 (2024-09-02)
 - Fixed: Pip upgrade added in 0.5.4 fixed for Windows. (Needed to
