@@ -3,10 +3,11 @@ pactivate
 
 `pactivate` is a wrapper for [virtualenv]'s `activate` script that will
 additionally create a virtual environment if one does not already exist. It
-depends only on the Python interpreter and its standard library; in
-particular it will bootstrap without virtualenv or even Pip, and never
-touch the user or system Python environment. It works with any version of
-Python supported by [`get-pip.py`], i.e., 2.7 onward.
+uses the standard Pip from [pypa.io] and virtualenv from [PyPI], so it
+depends on the OS (or you) providing only a Python interpreter, such as the
+Debian `python-minimal` package, and does not touch the system environment
+at all. It works with any version of Python supported by [`get-pip.py`],
+i.e., 2.7 onward.
 
 A `pae` Bash shell function that provides functionality similar to
 [virtualenvwrapper], [pipx] and the like is also provided. See the
@@ -277,6 +278,7 @@ contents of this file are ignored.)
 
 
 <!-------------------------------------------------------------------->
+[PyPI]: https://pypi.org/
 [`activate`]: https://virtualenv.pypa.io/en/latest/user_guide.html#activators
 [`get-pip.py`]: https://github.com/pypa/get-pip
 [`pythonz`]: https://github.com/saghul/pythonz
@@ -284,6 +286,7 @@ contents of this file are ignored.)
 [docker-is-root]: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
 [pae]: ./doc/pae.md
 [pipx]: https://pipx.pypa.io/
+[pypa.io]: https://www.pypa.io/en/latest/
 [req]: https://pip.pypa.io/en/stable/reference/requirements-file-format/
 [source]: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-_002e
 [virtualenv]: https://virtualenv.pypa.io/
