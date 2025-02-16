@@ -77,6 +77,7 @@ pae() {
     local pae_home quiet action vedir bindir bincmd
 
     #   $pae_home: default virtual environments location
+    #   XXX Bash 3 does not support `test -v`; find another way to do this.
     if   [[ -v PAE_HOME ]]; then      pae_home="$PAE_HOME"
     elif [[ -v WORKON_HOME ]];then    pae_home="$WORKON_HOME"
     else                              pae_home=~/.pyvirtenv
