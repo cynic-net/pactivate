@@ -1,9 +1,31 @@
-#   pactivate version 0.5.6   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.7   https://github.com/cynic-net/pactivate
 
-[ -n "$BASH_VERSION" ] || { echo 1>&2 "source (.) this with Bash."; exit 9; }
 #   https://stackoverflow.com/a/28776166/107294
+#   This test works only with Bash, not sh, ksh or zsh, which do not
+#   check for this `return` error. ksh and zsh users who run this will
+#   (perhaps mysteriously) find their virtualenv not activated.
+#   (Virtualenv's bin/activate script has the same issue.)
 (return 0 2>/dev/null) \
-    || { echo 1>&2 "source (.) pactivate with Bash."; exit 9; }
+    || { echo 1>&2 "don't run pactivate, source (.) it."; exit 9; }
+
+#   This uses various Bashisms, such as `[[`, and so requires a reasonably
+#   Bash-compatible shell. As far as we know, these are just ksh and zsh,
+#   so fail immediately if we're not running on Bash or one of those.
+[ -n "${BASH_VERSION-}""${KSH_VERSION-}""${ZSH_VERSION-}" ] || {
+    echo 1>&2 "source (.) this with bash, ksh or zsh."
+    #   Here we don't know if the "being sourced" check above succeeded, so
+    #   we first do a `return` which will exit if we're being sourced, and
+    #   then an `exit` which will exit if the return failed because we're
+    #   not being sourced.
+    return 9
+    exit 9
+}
+
+#   This has seen very limited testing under ksh or zsh (the test framework
+#   doesn't test under these shells at all), so print a warning to help
+#   with debugging issues reported by users.
+[ -n "$BASH_VERSION" ] || { echo 1>&2 \
+    "WARNING: You're not using Bash. Let's hope you're compatible!"; }
 
 __pa_cleanup() {
     unset __pa_cleanup __pa_echo \

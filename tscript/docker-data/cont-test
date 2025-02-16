@@ -60,12 +60,12 @@ echo "Using $pa_python found at $(type -p $pa_python): $($pa_python --version)"
 
 echo '━━━━━ error when run with /bin/sh'
 /bin/sh   $pactivate 2>err-sh   && fail "didn't fail when run with /bin/sh"
-[[ 'source (.) this with Bash.' == "$(cat err-sh)" ]] \
+[[ 'source (.) this with bash, ksh or zsh.' == "$(cat err-sh)" ]] \
     || { cat err-sh; fail "bad message"; }
 
 echo '━━━━━ error when run with /bin/bash'
 /bin/bash $pactivate 2>err-bash && fail "didn't fail when run with /bin/bash"
-[[ 'source (.) pactivate with Bash.' == "$(cat err-bash)" ]] \
+[[ "don't run pactivate, source (.) it." == "$(cat err-bash)" ]] \
     || { cat err-bash; fail "bad message"; }
 
 echo '━━━━━ unknown argument error'

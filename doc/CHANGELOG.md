@@ -14,6 +14,12 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.7 (2025-02-17)
+- Fixed: Allow use with ksh and zsh, and don't exit the calling shell
+  (causing your window to mysteriously close) if you're using one of those
+- Note: The check that you're sourcing the file instead of running it
+  works only in bash; the virtualenv bin/activate script has the same issue.
+
 ### pactivate 0.5.6 (2024-09-04)
 - Fixed: Suppress pointless "py is not python" warning on Windows.
 - Fixed: `cmp` command argument needed to be quoted.
