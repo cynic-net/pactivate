@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.8 (2025-04-10)
+- Fixed: Paths in `requirements.txt` now relative to projdir, not CWD.
+
 ### pactivate 0.5.7 (2025-02-17)
 - Fixed: Allow use with ksh and zsh, and don't exit the calling shell
   (causing your window to mysteriously close) if you're using one of those

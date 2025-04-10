@@ -1,4 +1,4 @@
-#   pactivate version 0.5.7   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.8   https://github.com/cynic-net/pactivate
 
 #   https://stackoverflow.com/a/28776166/107294
 #   This test works only with Bash, not sh, ksh or zsh, which do not
@@ -157,8 +157,10 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
     && "$__pa_builddir"/virtualenv/[bS]*/python -m pip install -q -U pip \
     && "$__pa_builddir"/virtualenv/[bS]*/pip --version \
     && [[ -f "$__pa_requirements" ]] \
-    && "$__pa_builddir"/virtualenv/[bS]*/pip \
-        install $__pa_quiet -r "$__pa_requirements"
+    && (    command cd "$(dirname "$__pa_requirements")" \
+         && "$__pa_builddir"/virtualenv/[bS]*/pip \
+                install $__pa_quiet -r "$__pa_requirements"
+       )
 }
 
 #   On Windows when we're using the default `py` "interpreter," we're
