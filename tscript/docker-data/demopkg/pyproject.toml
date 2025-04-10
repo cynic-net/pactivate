@@ -1,0 +1,4 @@
+[project]
+version = '0.0.0'
+name = 'demopkg'
+description = 'Demonstration package to confirm package install'

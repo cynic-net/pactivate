@@ -151,7 +151,9 @@ rm .python
 echo '━━━━━ pactivate with -[Bb] and requirements.txt'
 echo '───── building altbase'
 altbase=/test/test-requirements; mkdir -p $altbase
-echo 'six>=1' > $altbase/requirements.txt
+echo  > $altbase/requirements.txt 'six>=1'
+echo >> $altbase/requirements.txt './demopkg/'
+cat $altbase/requirements.txt
 echo '───── running build'
 (cd /tmp && . /test/$pactivate -B $altbase -b $altbase/build) \
     || fail "build failure"
