@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+#### pae 0.8.3 (2025-12-03)
+- Fixed: remove Bash 3.x incompatibility in `pae` script
+
 ### pactivate 0.5.8 (2025-04-10)
 - Fixed: Paths in `requirements.txt` now relative to projdir, not CWD.
 
