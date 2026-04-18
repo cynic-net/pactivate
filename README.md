@@ -155,12 +155,16 @@ only to install a new virtualenv when there isn't an existing one. Changing
 this after the virtualenv has been built will not change the interpreter
 used in the existing virtualenv.
 
-### Command-line options
+### `pactivate` Command-line options
 
-- `-b BUILD`: Set the build dir
-- `-B PROJDIR`: Set the project dir (sometimes called the "BASE" dir)
-- `-i`: Enter interactive shell in container after the test completes
 - `-q`: Run programs in quiet mode to reduce output verbosity
+- `-B PROJDIR`: Set the project directory (sometimes called the "BASE"
+  directory), defaulting to the directory containing `pactivate`. This
+  determines whence `requirements.txt` is read and the default location of
+  the build directory.
+- `-b BUILD`: Set the build directory, defaulting to `.build/` in the
+  directory containing `pactivate`. `bootstrap/pactivate/` and
+  `virtualenv/` are created under this directory.
 
 You can use a different python interpreter by symlinking `$PROJDIR/.python` to
 your interpreter of choice. This is not normally commited, but is in $PROJDIR
