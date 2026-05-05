@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.9 (2026-05-05)
+- Fixed: Pythons 3.8 and 3.9 now use legacy get-pip.py.
+
 #### pae 0.8.3 (2025-12-03)
 - Fixed: remove Bash 3.x incompatibility in `pae` script
 
