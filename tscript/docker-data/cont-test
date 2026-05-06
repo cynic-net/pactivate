@@ -165,6 +165,9 @@ if [[ ! -x /usr/bin/python2 ]]; then
     echo '━━━━━ (Python 2 tests skipped)'
 else
     echo '━━━━━ run pactivate with Python 2 and requirements.txt'
+    #   Reset $bsve in case it had a version number added above. (When the 3.x
+    #   Python for the distro is also not current get-pip.py but versioned.)
+    bsve=$build/bootstrap/pactivate     # reset in case changed above
     #   Alternate base dir configured for different Python interpreter.
     altbase=/test/altbase; mkdir -p $altbase
     ln -s /usr/bin/python2 $altbase/.python
