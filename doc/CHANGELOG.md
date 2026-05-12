@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.10 (2026-05-12)
+- Added: now ignores args after `--`; see README for why.
+
 ### pactivate 0.5.9 (2026-05-05)
 - Fixed: Pythons 3.8 and 3.9 now use legacy get-pip.py.
 

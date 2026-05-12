@@ -1,4 +1,4 @@
-#   pactivate version 0.5.9   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.10   https://github.com/cynic-net/pactivate
 
 #   https://stackoverflow.com/a/28776166/107294
 #   This test works only with Bash, not sh, ksh or zsh, which do not
@@ -41,6 +41,7 @@ while [[ $# -gt 0 ]]; do case "$1" in
     -b) shift; __pa_builddir="$1"; shift;;
     -B) shift; __pa_basedir="$1"; shift;;
     -q) shift; __pa_quiet=-q;;
+    --) shift; break;;
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
 

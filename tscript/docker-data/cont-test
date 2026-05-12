@@ -148,6 +148,13 @@ echo '───── removing .python symlink'
 rm .python
 (. $pactivate -q && pip --version) || fail "pip --version didn't work"
 
+#   This has to be after all the various tests above showing that the basic
+#   functionality works because it actually re-runs pactivate: we don't
+#   want a functionality failure to make it appear that argument ignore
+#   doesn't work.
+echo '━━━━━ ignores arguments after --'
+(. $pactivate -- -XX) || fail "didn't ignore args after --"
+
 echo '━━━━━ pactivate with -[Bb] and requirements.txt'
 echo '───── building altbase'
 altbase=/test/test-requirements; mkdir -p $altbase

@@ -157,6 +157,7 @@ used in the existing virtualenv.
 
 ### `pactivate` Command-line options
 
+- `--`: Ignore any further command line arguments (see below).
 - `-q`: Run programs in quiet mode to reduce output verbosity
 - `-B PROJDIR`: Set the project directory (sometimes called the "BASE"
   directory), defaulting to the directory containing `pactivate`. This
@@ -166,7 +167,26 @@ used in the existing virtualenv.
   directory containing `pactivate`. `bootstrap/pactivate/` and
   `virtualenv/` are created under this directory.
 
-You can use a different python interpreter by symlinking `$PROJDIR/.python` to
+#### `--` Parameter
+
+If no explicit command-line arguments are given to `source pactivate`,
+pactivate will see `$@` in the current shell, which may be set to
+non-pactivate arguments. To handle this situation, pass `--` as the sole
+argument (`source pactivate --`) or after any arguments you may supply
+optionally; this will change pactivate's `$@` to your arguments (… `--`)
+instead of using the current `$@` of the calling process.
+
+(Remember that passing `$foo` when _foo_ is an empty string, or
+`"${foo[@]}"` when _foo_ is an empty array, will be seen as "no command
+line options" and `$@` will be its current, possibly non-empty, value.)
+
+This may also be useful to callers that want to pass on their initial
+arguments (e.g., `-B PROJDIR`) to pactivate but also accept further
+arguments for use elsewhere.
+
+#### Alternate Python Interpreters
+
+You can use a different Python interpreter by symlinking `$PROJDIR/.python` to
 your interpreter of choice. This is not normally commited, but is in $PROJDIR
 so that it persists even after `rm -rf $BUILD` to do a fully clean build.
 
