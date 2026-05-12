@@ -1,4 +1,4 @@
-#   pae version 0.8.3   https://github.com/cynic-net/pactivate
+#   pae version 0.8.4   https://github.com/cynic-net/pactivate
 #
 #   pae provides pactivate-based commands similar to virtualenvwrapper.
 #   See the __pae_usage() function below for full documentation.
@@ -20,7 +20,7 @@
 
 #   You can change this in your environment if you want to download
 #   pactivate from a different source.
-__pae_pactivate_url=https://raw.githubusercontent.com/cynic-net/pactivate/main/pactivate
+__pae_pactivate_url=https://raw.githubusercontent.com/cynic-net/pactivate/refs/heads/main/pactivate
 
 __pae_usage() {
     cat <<_____

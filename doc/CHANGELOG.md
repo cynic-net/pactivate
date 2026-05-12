@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+#### pae 0.8.4 (2026-05-12)
+- Fixed: More reliable download URL for -U/-D option.
+
 ### pactivate 0.5.10 (2026-05-12)
 - Added: now ignores args after `--`; see README for why.
 

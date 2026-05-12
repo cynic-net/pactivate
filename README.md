@@ -55,7 +55,7 @@ performing its other actions. For example:
 
     $ git init myproject
     $ cd myproject
-    $ curl -O https://raw.githubusercontent.com/cynic-net/pactivate/main/pactivate
+    $ curl -O https://raw.githubusercontent.com/cynic-net/pactivate/refs/heads/main/pactivate
     $ git add pactivate
     $ git commit -m 'pactivate: from https://github.com/cynic-net/pactivate'
 
