@@ -1,4 +1,4 @@
-#   pactivate version 0.5.10   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.11   https://github.com/cynic-net/pactivate
 
 #   https://stackoverflow.com/a/28776166/107294
 #   This test works only with Bash, not sh, ksh or zsh, which do not
@@ -34,7 +34,7 @@ __pa_cleanup() {
 }
 __pa_echo() { [[ -n $__pa_quiet ]] || echo "$@"; }
 
-__pa_basedir=$(cd "$(dirname "$BASH_SOURCE")" && pwd -P)
+__pa_basedir=$(command cd "$(dirname "$BASH_SOURCE")" && pwd -P)
 __pa_builddir=
 __pa_quiet=
 while [[ $# -gt 0 ]]; do case "$1" in
@@ -77,7 +77,8 @@ if (M < 3 or (M == 3 and m < 10)):
 
 __pa_requirements="$__pa_basedir/requirements.txt"
 
-[[ -z $__pa_builddir ]] && __pa_builddir=$(cd "$__pa_basedir" && pwd -P)/.build
+[[ -z $__pa_builddir ]] \
+    && __pa_builddir=$(command cd "$__pa_basedir" && pwd -P)/.build
 
 __pa_bootdir="$__pa_builddir/bootstrap/pactivate${__pa_pyver}"
 mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
@@ -134,8 +135,8 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         #   way. Fortunately we already know that the binary exists and is
         #   a Python interpreter.
         __pa_python_deref=$(readlink "$__pa_python")
-        __pa_python_deref=$(cd "$__pa_basedir" \
-            && cd $(dirname "$__pa_python_deref") \
+        __pa_python_deref=$(command cd "$__pa_basedir" \
+            && command cd $(dirname "$__pa_python_deref") \
             && pwd -P)/$(basename "$__pa_python_deref")
         echo " -> $__pa_python_deref"
     else

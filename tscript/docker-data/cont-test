@@ -49,7 +49,24 @@ clean_virtualenv() { rm -rf "$virtualenv"; }
 ####################################################################
 #   Tests
 
-cd /test/
+#   Users often have a `cd` function or alias that does special things,
+#   and may even print out stuff. Either can break our code, so try to
+#   ensure we're always using the standard shell built-in. (This doesn't
+#   always force an error exit, e.g., when used in a $(…) subshell, so
+#   we print something we hope will alert the dev anyway.)
+cd() {
+    echo 1>&2
+    echo 1>&2
+    echo 1>&2 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo 1>&2 "ERROR: don't use user's 'cd' command!"
+    echo 1>&2 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo 1>&2
+    echo -n 'XXX'   # hopefully mess up caller if using output of subshell
+    sleep 10        # for a bit, keep it from scrolling off the screen
+    exit 10
+}
+
+command cd /test/
 
 echo '━━━━━ find Python interpreter name'
 #   Figure out which Python interpeter binary we're doing in the same way
@@ -111,6 +128,11 @@ bsve=$(echo $bsve*); echo "bsve=$bsve"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
 $venvpip --version || fail "pip --version didn't work"
 
+echo '━━━━━ run pactivate already-bootstrapped'
+rm -rf .build/virtualenv/  # remove only virtual environment, leaving bootstrap
+(. $pactivate)
+$virtualenv/bin/pip --version || fail "pip --version didn't work"
+
 echo '━━━━━ run pactivate installed'
 #   This should do nothing but run the existing virtualenv's activate
 #   It also tests the -q option so we can leave it out (by default)
@@ -138,9 +160,10 @@ clean_virtualenv
 #   We use a relative symlink here to ensure that pactivate finds the absolute
 #   path to it, rather than re-using the relative path at a different
 #   directory level and thus having the link point to the wrong place.
-echo ln -s ../$(type $pa_python) .python
+echo ln -s ../$(type -p $pa_python) .python
 ln -s ../$(type -p $pa_python) .python
 (. $pactivate -q && $venvpip --version) || fail "pip --version didn't work"
+
 echo '───── removing .python symlink'
 #   A virtualenv created with the .python symlink should still work even
 #   if the symlink is removed or, more importantly, changed. Removal would
@@ -163,7 +186,7 @@ echo  > $altbase/requirements.txt 'six>=1'
 echo >> $altbase/requirements.txt './demopkg/'
 cat $altbase/requirements.txt
 echo '───── running build'
-(cd /tmp && . /test/$pactivate -B $altbase -b $altbase/build) \
+(command cd /tmp && . /test/$pactivate -B $altbase -b $altbase/build) \
     || fail "build failure"
 echo '───── testing six import'
 $altbase/build/virtualenv/bin/python -c 'import six' \
@@ -186,7 +209,7 @@ else
     clean_virtualenv
     #   Rebuild and check
     echo '───── running build'
-    (cd /tmp && . /test/$pactivate -B $altbase -b $build) \
+    (command cd /tmp && . /test/$pactivate -B $altbase -b $build) \
         || fail "build failure"
     [[ -d ${bsve}2.7 ]] || {
         ls -la $build/bootstrap/;

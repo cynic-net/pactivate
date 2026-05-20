@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.11 (2026-05-20)
+- Fixed some breakage when user has her own special `cd` command.
+
 #### pae 0.8.4 (2026-05-12)
 - Fixed: More reliable download URL for -U/-D option.
 
