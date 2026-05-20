@@ -28,6 +28,7 @@ echo "DISTRO='$DISTRO' TEST_QUIET='$TEST_QUIET' TEST_INTERACT='$TEST_INTERACT'"
 pactivate="./pactivate ${TEST_QUIET:+-q}"
 build=/test/.build
 virtualenv=$build/virtualenv
+venvpip=$virtualenv/bin/pip
 bsve=$build/bootstrap/pactivate     # updated to actual path below
 
 #   Debian ≥12 and Ubuntu ≥23 use a Python 3.x with distutils deprecated/gone.
@@ -108,13 +109,13 @@ bsve=$(echo $bsve*); echo "bsve=$bsve"
 #   And now the actual pactivate clean tests
 [[ -x $bsve/pip ]] || fail "not executable: $bsve/pip"
 [[ -d $bsve/virtualenv/ ]] || fail "not a dir: $bsve/virtualenv/"
-$virtualenv/bin/pip --version || fail "pip --version didn't work"
+$venvpip --version || fail "pip --version didn't work"
 
 echo '━━━━━ run pactivate installed'
 #   This should do nothing but run the existing virtualenv's activate
 #   It also tests the -q option so we can leave it out (by default)
 #   for easier debugging in the more complex "with options" test below.
-(. $pactivate -q && pip --version) || fail "pip --version didn't work"
+(. $pactivate -q && $venvpip --version) || fail "pip --version didn't work"
 echo '───── checking .python difference warning'
 #   This should print a warning message about the interpreter being different.
 #   This won't fail if the warning isn't printed, but you can at least manually
@@ -123,7 +124,7 @@ echo '───── checking .python difference warning'
 #   appended to make it "different" from the standard one but still runnable.
 (cat $(type -p $pa_python); echo) > /tmp/bin-python; chmod +x /tmp/bin-python
 ln -s /tmp/bin-python .python
-(. $pactivate -q 2>err-diffwarn && pip --version) \
+(. $pactivate -q 2>err-diffwarn && $venvpip --version) \
     || fail "pip --version didn't work"
 echo 'Warning message was:'; cat err-diffwarn
 [[ $(cat err-diffwarn) =~ 'WARNING: .build/virtualenv/bin/python (' ]] \
@@ -139,14 +140,14 @@ clean_virtualenv
 #   directory level and thus having the link point to the wrong place.
 echo ln -s ../$(type $pa_python) .python
 ln -s ../$(type -p $pa_python) .python
-(. $pactivate -q && pip --version) || fail "pip --version didn't work"
+(. $pactivate -q && $venvpip --version) || fail "pip --version didn't work"
 echo '───── removing .python symlink'
 #   A virtualenv created with the .python symlink should still work even
 #   if the symlink is removed or, more importantly, changed. Removal would
 #   break in an obvious way, but changing to a different version of Python
 #   might break the virtualenv in much more subtle ways.
 rm .python
-(. $pactivate -q && pip --version) || fail "pip --version didn't work"
+(. $pactivate -q && $venvpip --version) || fail "pip --version didn't work"
 
 #   This has to be after all the various tests above showing that the basic
 #   functionality works because it actually re-runs pactivate: we don't
