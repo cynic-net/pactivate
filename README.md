@@ -233,6 +233,20 @@ the system.
 works and some of the constraints it must deal with.
 
 
+Releases
+--------
+
+`pactivate` is a single file; you can always get the latest release by
+downloading/copying it from the head of the `main` branch of this repo.
+(`pactivate` never has development versions on the `main` branch.)
+
+`pae` is similar: `pae` file is sourced to create the `pae()` Bash function
+so you also simply download and source it in your `.bashrc` or similar. It
+has a `-D` function to download the latest version of `pactivate` to the
+current working directory, as well as a `-U` function to update the version
+of pactivate it uses; both just download from the `main` branch on GitHub.
+
+
 Developer Notes
 ---------------
 
