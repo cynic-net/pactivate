@@ -1,4 +1,4 @@
-#   pactivate version 0.5.12   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.13   https://github.com/cynic-net/pactivate
 
 #   https://stackoverflow.com/a/28776166/107294
 #   This test works only with Bash, not sh, ksh or zsh, which do not
@@ -168,6 +168,12 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
          && "$__pa_builddir"/virtualenv/[bS]*/pip \
                 install $__pa_quiet -r "$__pa_requirements"
        )
+    #   As with $__pa_bootdir above, it turns out to be best to
+    #   self-git-ignore .build/virtualenv/ because even things with
+    #   virtualenv detection can miss it, and given that there's no way to
+    #   configure where this goes, there's no chance it can end up in the
+    #   wrong place (within a repo, anyway).
+    printf '*\n' >"$__pa_builddir/virtualenv/"/.gitignore
 }
 
 #   On Windows when we're using the default `py` "interpreter," we're
