@@ -14,6 +14,9 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
+### pactivate 0.5.12 (2026-07-11)
+- Self-git-ignore .build/bootstrap/pactivate/
+
 ### pactivate 0.5.11 (2026-05-20)
 - Fixed some breakage when user has her own special `cd` command.
 

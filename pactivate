@@ -1,4 +1,4 @@
-#   pactivate version 0.5.11   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.12   https://github.com/cynic-net/pactivate
 
 #   https://stackoverflow.com/a/28776166/107294
 #   This test works only with Bash, not sh, ksh or zsh, which do not
@@ -82,6 +82,11 @@ __pa_requirements="$__pa_basedir/requirements.txt"
 
 __pa_bootdir="$__pa_builddir/bootstrap/pactivate${__pa_pyver}"
 mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
+#   This will contain the bootstrap install of pip and virtualenv, but
+#   isn't a virtualenv and thus will not be recognised by tools like ruff
+#   as a dir to ignore. So self-git-ignore it which will do the trick for
+#   most things (including ruff).
+printf '*\n' >"$__pa_bootdir"/.gitignore
 
 #   Unlike virtualenv, pip -t does not change the bin/ directory to
 #   Scripts/ on Windows, so we can hardcode our bootstrap/bin/pip path.
