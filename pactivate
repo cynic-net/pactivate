@@ -30,7 +30,7 @@
 __pa_cleanup() {
     unset __pa_cleanup __pa_echo \
         __pa_builddir __pa_quiet __pa_python __pa_python_deref __pa_pyver \
-        __pa_bootdir __pa_basedir __pa_requirements __pa_dir
+        __pa_bootdir __pa_basedir __pa_requirements __pa_dir __pa_complete
 }
 __pa_echo() { [[ -n $__pa_quiet ]] || echo "$@"; }
 
@@ -151,7 +151,14 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         $__pa_quiet install --upgrade -t "$__pa_bootdir" pip virtualenv
 }
 
-[[ -d $__pa_builddir/virtualenv/ ]] || {
+#   The virtualenv dir is created at the start of the build, so its presence
+#   does not mean that the build finished; we mark completion with a file
+#   written only after the requirements have been installed. (Without this a
+#   build that failed part-way, e.g. because the network went down during the
+#   requirements install, would be taken as complete by every later run.)
+__pa_complete="$__pa_builddir/virtualenv/.pactivate-complete"
+
+[[ -f $__pa_complete ]] || {
     echo '----- Building virtualenv'
     echo -n "Using $__pa_python"
     if [[ -L $__pa_python ]]; then
@@ -204,6 +211,7 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
             __pa_cleanup; return 5
         }
     fi
+    echo 'virtualenv build completed' >"$__pa_complete"
 }
 
 #   On Windows when we're using the default `py` "interpreter," we're

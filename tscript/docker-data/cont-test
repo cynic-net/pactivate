@@ -138,6 +138,10 @@ echo '━━━━━ run pactivate installed'
 #   It also tests the -q option so we can leave it out (by default)
 #   for easier debugging in the more complex "with options" test below.
 (. $pactivate -q && $venvpip --version) || fail "pip --version didn't work"
+echo '───── checking that a complete virtualenv is not rebuilt'
+(. $pactivate >out-nobuild 2>&1) || fail "pactivate failed"
+grep -q 'Building virtualenv' out-nobuild \
+    && { cat out-nobuild; fail "rebuilt an already-complete virtualenv"; }
 echo '───── checking .python difference warning'
 #   This should print a warning message about the interpreter being different.
 #   This won't fail if the warning isn't printed, but you can at least manually
@@ -223,6 +227,11 @@ echo 'no-such-package-xyzzy-12345' > $badbase/requirements.txt
     && fail "didn't fail for unsatisfiable requirements.txt"
 [[ 'pactivate: requirements install failed' == $(tail -1 err-badreq) ]] \
     || { cat err-badreq; fail "bad message"; }
+#   The partly-built virtualenv must not be taken as complete by later runs.
+(. $pactivate -B $badbase -b $badbase/build 2>err-badreq2) \
+    && fail "second run accepted the partly-built virtualenv"
+[[ 'pactivate: requirements install failed' == $(tail -1 err-badreq2) ]] \
+    || { cat err-badreq2; fail "bad message"; }
 
 if [[ ! -x /usr/bin/python2 ]]; then
     echo '━━━━━ (Python 2 tests skipped)'

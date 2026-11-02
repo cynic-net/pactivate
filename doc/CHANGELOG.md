@@ -13,6 +13,11 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+- Fixed: A virtualenv whose build failed part-way is no longer taken as
+  complete by later runs; completion is now marked by a
+  `.pactivate-complete` file in the virtualenv rather than assumed from the
+  existence of the virtualenv dir. (Virtualenvs built by earlier versions
+  have no such file and so will be rebuilt once.)
 - Fixed: A failure to build the virtualenv or to install the requirements
   is now reported, and returns a non-zero exit code, instead of carrying on
   to activate a broken or missing virtualenv and returning success.
