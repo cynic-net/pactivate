@@ -13,6 +13,8 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+- Fixed: Relative `-b` and `-B` paths now work; previously a relative `-b`
+  silently skipped the `requirements.txt` install.
 
 ### pactivate 0.5.13 (2026-07-11)
 - Self-git-ignore .build/virtualenv/

@@ -192,6 +192,18 @@ echo '───── testing six import'
 $altbase/build/virtualenv/bin/python -c 'import six' \
     || fail "six import failure; requirements.txt broken?"
 
+echo '━━━━━ pactivate with relative -[Bb] paths'
+#   The paths to the build dir must still work after pactivate `command cd`s
+#   to the base dir to install the requirements.
+relbase=test-relative; mkdir -p /test/$relbase/build
+#   Re-use the bootstrap built above; it's the virtualenv build we're testing.
+cp -a $build/bootstrap /test/$relbase/build/bootstrap
+echo 'six>=1' > /test/$relbase/requirements.txt
+(command cd /test && . $pactivate -B $relbase -b $relbase/build) \
+    || fail "build failure with relative -B/-b"
+/test/$relbase/build/virtualenv/bin/python -c 'import six' \
+    || fail "six import failure; relative -B/-b broken?"
+
 if [[ ! -x /usr/bin/python2 ]]; then
     echo '━━━━━ (Python 2 tests skipped)'
 else

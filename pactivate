@@ -1,4 +1,4 @@
-#   pactivate version 0.5.13   https://github.com/cynic-net/pactivate
+#   pactivate version 0.5.13-current   https://github.com/cynic-net/pactivate
 
 #   https://stackoverflow.com/a/28776166/107294
 #   This test works only with Bash, not sh, ksh or zsh, which do not
@@ -30,7 +30,7 @@
 __pa_cleanup() {
     unset __pa_cleanup __pa_echo \
         __pa_builddir __pa_quiet __pa_python __pa_python_deref __pa_pyver \
-        __pa_bootdir __pa_basedir __pa_requirements
+        __pa_bootdir __pa_basedir __pa_requirements __pa_dir
 }
 __pa_echo() { [[ -n $__pa_quiet ]] || echo "$@"; }
 
@@ -44,6 +44,15 @@ while [[ $# -gt 0 ]]; do case "$1" in
     --) shift; break;;
     *)  echo 1>&2 "pactivate: unknown argument: $1"; __pa_cleanup; return 2;;
 esac; done;
+
+#   The base and build dirs must be absolute paths: we `command cd` to other
+#   directories below (to resolve the .python link and to install the
+#   requirements), where a relative path would resolve to a different place.
+__pa_dir="$__pa_basedir"
+__pa_basedir=$(command cd "$__pa_dir" && pwd -P) || {
+    echo 1>&2 "pactivate: cannot use base dir: $__pa_dir"
+    __pa_cleanup; return 2
+}
 
 if [[ -e $__pa_basedir/.python || -L $__pa_basedir/.python ]]; then
     #   Even if it's a dangling link (-e fails) we use it so that the
@@ -77,8 +86,18 @@ if (M < 3 or (M == 3 and m < 10)):
 
 __pa_requirements="$__pa_basedir/requirements.txt"
 
-[[ -z $__pa_builddir ]] \
-    && __pa_builddir=$(command cd "$__pa_basedir" && pwd -P)/.build
+if [[ -z $__pa_builddir ]]; then
+    __pa_builddir="$__pa_basedir/.build"
+else
+    #   The build dir need not already exist, so create it before resolving.
+    __pa_dir="$__pa_builddir"
+    mkdir -p "$__pa_dir" \
+        && __pa_builddir=$(command cd "$__pa_dir" && pwd -P) \
+        || {
+            echo 1>&2 "pactivate: cannot use build dir: $__pa_dir"
+            __pa_cleanup; return 2
+        }
+fi
 
 __pa_bootdir="$__pa_builddir/bootstrap/pactivate${__pa_pyver}"
 mkdir -p "$__pa_bootdir"    # also ensures that $__pa_builddir exists
