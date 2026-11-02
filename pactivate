@@ -190,18 +190,20 @@ __pa_complete="$__pa_builddir/virtualenv/.pactivate-complete"
         echo
     fi
     echo -n "Version: " && "$__pa_python" --version
-    #   1. Use virtualenv to create the new virtualenv.
-    #   2. Upgrade pip to the latest version, because often the get_pip.py
-    #      version is old enough that we'll get annoying upgrade messages
-    #      with every use if we don't do this. To reduce output size, we
-    #      do this quietly and display the new version after. (The old
-    #      version is displayed in the virtualenv creation output.)
-    #   Note that we _must_ use `python -m pip` because, on Windows due to
-    #   file locking, pip is unable to replace itself if you run it as pip.exe.
+    #   1. Create the virtualenv, but without the pip that virtualenv
+    #      bundles: that's a copy we did not choose, and it's as old as the
+    #      virtualenv release we happen to have bootstrapped.
+    #   2. Install pip with our bootstrap pip instead, run with the new
+    #      virtualenv's interpreter: pip installs into the environment of
+    #      the interpreter running it. --ignore-installed is essential,
+    #      because $PYTHONPATH also makes that pip see itself as already
+    #      installed, whereupon it does nothing at all and succeeds. To
+    #      reduce output size we install quietly and show the version after.
     PYTHONPATH="$__pa_bootdir" "$__pa_python_deref" -s -m virtualenv \
-        $__pa_quiet --prompt $(basename "$__pa_basedir") \
+        $__pa_quiet --no-pip --prompt $(basename "$__pa_basedir") \
         "$__pa_builddir/virtualenv/" \
-    && "$__pa_builddir"/virtualenv/[bS]*/python -m pip install -q -U pip \
+    && PYTHONPATH="$__pa_bootdir" "$__pa_builddir"/virtualenv/[bS]*/python \
+        -s -m pip install -q --ignore-installed pip \
     && "$__pa_builddir"/virtualenv/[bS]*/pip --version \
     || {
         echo 1>&2 "pactivate: virtualenv build failed"

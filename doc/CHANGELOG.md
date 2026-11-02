@@ -13,6 +13,11 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+- Changed: The virtualenv's pip is now installed by our bootstrap pip
+  (`virtualenv --no-pip`), instead of being seeded from the copy bundled in
+  the virtualenv release we happen to have and then upgraded. Rebuilding
+  just the virtualenv now needs network access, where before virtualenv's
+  bundled pip could serve offline.
 - Fixed: Bootstrap pip and virtualenv install failures are now reported and
   return a non-zero code. A failing `curl` in particular went unnoticed:
   without `-o pipefail`, which we cannot require of the caller, the
