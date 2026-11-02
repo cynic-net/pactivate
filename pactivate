@@ -27,6 +27,11 @@
 [ -n "$BASH_VERSION" ] || { echo 1>&2 \
     "WARNING: You're not using Bash. Let's hope you're compatible!"; }
 
+#   Codes returned on failure: 2 bad command line or directory, 3 unusable
+#   Python interpreter, 4 virtualenv build, 5 requirements install,
+#   6 virtualenv activation, 7 bootstrap install, 9 sourced incorrectly.
+#   Every one of these must `__pa_cleanup` first, or it leaves our variables
+#   set in the caller's shell.
 __pa_cleanup() {
     unset __pa_cleanup __pa_echo \
         __pa_builddir __pa_quiet __pa_python __pa_python_deref __pa_pyver \
@@ -121,7 +126,7 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         ' || {
         echo 1>&2 \
             "Cannot import 'distuils.cmd'; apt-get install python3-distutils?"
-        return 3
+        __pa_cleanup; return 3
     }
     #   • get-pip.py produces spurious upgrade notices on older Python versions
     #   such as 3.6 or 2.7; --disable-pip-version-check suppresses these.
@@ -135,8 +140,14 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         "https://bootstrap.pypa.io/pip/$__pa_pyver/get-pip.py" \
         | "$__pa_python" - \
             $__pa_quiet -t "$__pa_bootdir" --disable-pip-version-check \
-    || return $?
-    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" --version
+    || {
+        echo 1>&2 "pactivate: bootstrap pip download failed"
+        __pa_cleanup; return 7
+    }
+    PYTHONPATH="$__pa_bootdir" "$__pa_bootdir/bin/pip" --version || {
+        echo 1>&2 "pactivate: bootstrap pip install failed"
+        __pa_cleanup; return 7
+    }
 }
 
 [[ -d $__pa_bootdir/virtualenv/ ]] || {
@@ -148,7 +159,11 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
     #   Note that we _must_ use `python -m pip` because, on Windows due to
     #   file locking, pip is unable to replace itself if you run it as pip.exe.
     PYTHONPATH="$__pa_bootdir" "$__pa_python" -m pip \
-        $__pa_quiet install --upgrade -t "$__pa_bootdir" pip virtualenv
+        $__pa_quiet install --upgrade -t "$__pa_bootdir" pip virtualenv \
+    || {
+        echo 1>&2 "pactivate: bootstrap virtualenv install failed"
+        __pa_cleanup; return 7
+    }
 }
 
 #   The virtualenv dir is created at the start of the build, so its presence

@@ -13,6 +13,12 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+- Fixed: Bootstrap pip and virtualenv install failures are now reported and
+  return a non-zero code. A failing `curl` in particular went unnoticed:
+  without `-o pipefail`, which we cannot require of the caller, the
+  `curl | python -` pipeline takes its exit code from a `python` that
+  succeeds when given no input.
+- Fixed: All failure returns now unset pactivate's internal variables.
 - Fixed: A virtualenv whose build failed part-way is no longer taken as
   complete by later runs; completion is now marked by a
   `.pactivate-complete` file in the virtualenv rather than assumed from the

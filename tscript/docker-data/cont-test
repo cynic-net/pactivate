@@ -208,6 +208,24 @@ echo 'six>=1' > /test/$relbase/requirements.txt
 /test/$relbase/build/virtualenv/bin/python -c 'import six' \
     || fail "six import failure; relative -B/-b broken?"
 
+echo '━━━━━ bootstrap pip download failure returns failure'
+#   Which of the two checks catches a failing `curl` depends on the caller:
+#   the pipeline reports curl's failure only under `-o pipefail`, which we
+#   cannot require, and otherwise succeeds because `python -` given no input
+#   exits successfully. Both callers must get a failure, so test both.
+mkdir -p /test/stub
+printf '#!/bin/sh\nexit 6\n' > /test/stub/curl; chmod +x /test/stub/curl
+(   set -o pipefail; PATH=/test/stub:$PATH
+    . $pactivate -b /test/build-nocurl1 2>err-nocurl1) \
+    && fail "didn't fail when curl failed under -o pipefail"
+[[ 'pactivate: bootstrap pip download failed' == $(tail -1 err-nocurl1) ]] \
+    || { cat err-nocurl1; fail "bad message"; }
+(   set +o pipefail; PATH=/test/stub:$PATH
+    . $pactivate -b /test/build-nocurl2 2>err-nocurl2) \
+    && fail "didn't fail when curl failed without -o pipefail"
+[[ 'pactivate: bootstrap pip install failed' == $(tail -1 err-nocurl2) ]] \
+    || { cat err-nocurl2; fail "bad message"; }
+
 echo '━━━━━ virtualenv build failure returns failure'
 #   A plain file where the virtualenv must go makes `virtualenv` fail. We
 #   re-use the bootstrap built above so this needs no further downloads.
