@@ -14,7 +14,7 @@ specific releases can also be fetched via the Git commit ID.)
 
 ### -current
 
-### pactivate 0.5.12 (2026-07-11)
+### pactivate 0.5.13 (2026-07-11)
 - Self-git-ignore .build/virtualenv/
 
 ### pactivate 0.5.12 (2026-07-11)
