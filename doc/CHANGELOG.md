@@ -13,6 +13,9 @@ and the version number is bumped. (Not all releases are tagged, but
 specific releases can also be fetched via the Git commit ID.)
 
 ### -current
+- Fixed: A failure to build the virtualenv or to install the requirements
+  is now reported, and returns a non-zero exit code, instead of carrying on
+  to activate a broken or missing virtualenv and returning success.
 - Fixed: Relative `-b` and `-B` paths now work; previously a relative `-b`
   silently skipped the `requirements.txt` install.
 

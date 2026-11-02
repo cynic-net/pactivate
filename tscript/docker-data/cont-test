@@ -204,6 +204,26 @@ echo 'six>=1' > /test/$relbase/requirements.txt
 /test/$relbase/build/virtualenv/bin/python -c 'import six' \
     || fail "six import failure; relative -B/-b broken?"
 
+echo '━━━━━ virtualenv build failure returns failure'
+#   A plain file where the virtualenv must go makes `virtualenv` fail. We
+#   re-use the bootstrap built above so this needs no further downloads.
+failbase=/test/test-failbuild; mkdir -p $failbase/build
+cp -a $build/bootstrap $failbase/build/bootstrap
+printf '' > $failbase/build/virtualenv
+(. $pactivate -B $failbase -b $failbase/build 2>err-failbuild) \
+    && fail "didn't fail when the virtualenv build failed"
+[[ 'pactivate: virtualenv build failed' == $(tail -1 err-failbuild) ]] \
+    || { cat err-failbuild; fail "bad message"; }
+
+echo '━━━━━ requirements install failure returns failure'
+badbase=/test/test-badreq; mkdir -p $badbase/build
+cp -a $build/bootstrap $badbase/build/bootstrap
+echo 'no-such-package-xyzzy-12345' > $badbase/requirements.txt
+(. $pactivate -B $badbase -b $badbase/build 2>err-badreq) \
+    && fail "didn't fail for unsatisfiable requirements.txt"
+[[ 'pactivate: requirements install failed' == $(tail -1 err-badreq) ]] \
+    || { cat err-badreq; fail "bad message"; }
+
 if [[ ! -x /usr/bin/python2 ]]; then
     echo '━━━━━ (Python 2 tests skipped)'
 else

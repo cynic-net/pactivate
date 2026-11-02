@@ -174,7 +174,6 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
     #      with every use if we don't do this. To reduce output size, we
     #      do this quietly and display the new version after. (The old
     #      version is displayed in the virtualenv creation output.)
-    #   3. If we have a requirements file, install its contents.
     #   Note that we _must_ use `python -m pip` because, on Windows due to
     #   file locking, pip is unable to replace itself if you run it as pip.exe.
     PYTHONPATH="$__pa_bootdir" "$__pa_python_deref" -s -m virtualenv \
@@ -182,17 +181,29 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
         "$__pa_builddir/virtualenv/" \
     && "$__pa_builddir"/virtualenv/[bS]*/python -m pip install -q -U pip \
     && "$__pa_builddir"/virtualenv/[bS]*/pip --version \
-    && [[ -f "$__pa_requirements" ]] \
-    && (    command cd "$(dirname "$__pa_requirements")" \
-         && "$__pa_builddir"/virtualenv/[bS]*/pip \
-                install $__pa_quiet -r "$__pa_requirements"
-       )
+    || {
+        echo 1>&2 "pactivate: virtualenv build failed"
+        __pa_cleanup; return 4
+    }
     #   As with $__pa_bootdir above, it turns out to be best to
     #   self-git-ignore .build/virtualenv/ because even things with
     #   virtualenv detection can miss it, and given that there's no way to
     #   configure where this goes, there's no chance it can end up in the
     #   wrong place (within a repo, anyway).
     printf '*\n' >"$__pa_builddir/virtualenv/"/.gitignore
+    #   An `if` rather than `&&` because a false test at the end of this
+    #   block would be a failure exit for a caller running under `set -e`.
+    if [[ -f "$__pa_requirements" ]]; then
+        #   We `cd` so that relative paths in the requirements file are
+        #   relative to it, not to the caller's current directory.
+        (   command cd "$(dirname "$__pa_requirements")" \
+         && "$__pa_builddir"/virtualenv/[bS]*/pip \
+                install $__pa_quiet -r "$__pa_requirements"
+        ) || {
+            echo 1>&2 "pactivate: requirements install failed"
+            __pa_cleanup; return 5
+        }
+    fi
 }
 
 #   On Windows when we're using the default `py` "interpreter," we're
@@ -211,5 +222,8 @@ if (M < 3 or (M == 3 and m < 11)): import distutils.cmd # deprecated ≥3.11
             "($("$__pa_python" --version 2>&1))" \
     )
 
-. "$__pa_builddir"/virtualenv/[bS]*/activate
+. "$__pa_builddir"/virtualenv/[bS]*/activate || {
+    echo 1>&2 "pactivate: cannot activate virtualenv"
+    __pa_cleanup; return 6
+}
 __pa_cleanup

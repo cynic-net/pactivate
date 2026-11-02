@@ -295,6 +295,9 @@ particular test script (e.g., `-i` for `pae-test`) are ignored.
    also cannot use `trap` for any cleanup because a) we're only a fragment
    of a script, so we never exit, and b) it would override any `trap`
    setting in a calling script.
+3. A false test at the end of a block is the value of that block and thus
+   of the sourced script, which under `-e` aborts the caller. (This is why
+   the `requirements.txt` install is guarded with `if`, not `&&`.)
 
 ### Sudo for Docker
 
