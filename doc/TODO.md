@@ -20,10 +20,11 @@ To Do
 
 ### Consider
 
-- Some commands in `pactivate` remain untested, and some even can't be
-  tested, such as the current `curl` command because it's in a pipeline
-  and we can't guarantee that `-o pipefail` is enabled. Consider whether
-  we need to test all of these explicitly for better error messages.
+- Some commands in `pactivate` remain untested. Consider whether we need to
+  test all of these explicitly for better error messages. (The `curl`,
+  which cannot report its own failure from a pipeline unless the caller
+  happens to have set `-o pipefail`, is now covered by the check on the
+  bootstrap pip install that follows it.)
 
 ### Bugfixes that may not be worth the added complexity
 
